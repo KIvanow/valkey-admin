@@ -1,7 +1,7 @@
 import { type PayloadAction, type Middleware } from '@reduxjs/toolkit';
 import { setConnected, setError } from '../../features/wsconnection/wsConnectionSlice';
 
-export let socket: WebSocket | null = null;
+let socket: WebSocket | null = null;
 
 export const wsMiddleware: Middleware = store => next => (action) => {
     const typedAction = action as PayloadAction
@@ -32,4 +32,9 @@ export const wsMiddleware: Middleware = store => next => (action) => {
 }
 
 
-
+export function getSocket(): WebSocket {
+    if (!socket) {
+        throw new Error("WebSocket is not connected");
+    }
+    return socket;
+}

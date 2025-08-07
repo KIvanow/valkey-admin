@@ -1,15 +1,13 @@
 import { type PayloadAction, type Middleware } from '@reduxjs/toolkit';
-import { setError as setError, selectConnected, selectConnecting } from '../../features/valkeyconnection/valkeyConnectionSlice';
-import { socket } from '../ws/wsMiddleware';
+import { setError as setError, selectConnected, selectConnecting, setConnecting, setConnected } from '../../features/valkeyconnection/valkeyConnectionSlice';
+import { setLastCommand } from '../../features/valkeycommand/valkeycommandSlice';
+import { getSocket } from '../ws/wsMiddleware';
 import { setCommandError } from '../../features/valkeycommand/valkeycommandSlice';
 
-function isSocketReady() {
-    return socket != null && socket.readyState === WebSocket.OPEN
-}
-
-export const valkeyConnectMiddlware: Middleware = store => next => async (action) => {
+export const valkeyMiddleware: Middleware = store => next => async (action) => {
+    const socket = getSocket();
     const typedAction = action as PayloadAction
-    if (typedAction.type === 'valkeyconnection/setConnecting') {
+    if (typedAction.type === setConnecting.type) {
         try {
             const canAttemptConnection = !selectConnected(store.getState()) && !selectConnecting(store.getState())
 
@@ -22,7 +20,7 @@ export const valkeyConnectMiddlware: Middleware = store => next => async (action
 
                 console.log("Connected to Valkey: ", action.payload.info)
 
-                if (action.type === 'valkeyconnection/setConnected') {
+                if (action.type === setConnected.type) {
                     store.dispatch(action)
                 }
             }
@@ -32,14 +30,10 @@ export const valkeyConnectMiddlware: Middleware = store => next => async (action
         }
         return next(action);
     }
-    return next(action);
-}
-
-export const valkeySendCommandMiddleware: Middleware = store => next => async (action) => {
-    const typedAction = action as PayloadAction
-    if (typedAction.type === 'valkeyconnection/sendCommand' && isSocketReady()) {
+    if (typedAction.type === setLastCommand.type) {
         try {
             socket.send(JSON.stringify(typedAction))
+            console.log("Sending command to Valkey with payload: ", typedAction.payload)
         }
         catch (e) {
             store.dispatch(setCommandError(e));

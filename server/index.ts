@@ -26,7 +26,6 @@ wss.on('connection', (ws: WebSocket) => {
 })
 
 async function connectToValkey(ws: WebSocket, payload) {
-
     const addresses = [
         {
             host: payload.host,
@@ -57,9 +56,8 @@ async function connectToValkey(ws: WebSocket, payload) {
     catch (err) {
         console.log("Error connecting to Valkey", err)
         ws.send(JSON.stringify({
-            type: "valkey-status",
-            message: "Failed to connect to Valkey",
-            error: err
+            type: "valkeyconnection/setError",
+            payload: err
         }))
     }
 }

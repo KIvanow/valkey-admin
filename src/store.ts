@@ -3,7 +3,7 @@ import wsConnectionReducer from "./features/wsconnection/wsConnectionSlice";
 import valkeyConnectionReducer from "./features/valkeyconnection/valkeyConnectionSlice";
 import valkeyCommandReducer from "./features/valkeycommand/valkeycommandSlice";
 import { wsMiddleware } from "./middleware/ws/wsMiddleware";
-import { valkeyConnectMiddlware } from "./middleware/valkey/valkeyMiddleware";
+import { valkeyMiddleware } from "./middleware/valkey/valkeyMiddleware";
 
 export const store = configureStore({
     reducer: {
@@ -12,7 +12,7 @@ export const store = configureStore({
         valkeycommand: valkeyCommandReducer
     },
     middleware: getDefaultMiddleware => {
-        return getDefaultMiddleware().concat(wsMiddleware, valkeyConnectMiddlware)
+        return getDefaultMiddleware().concat(wsMiddleware, valkeyMiddleware)
     }
 })
 

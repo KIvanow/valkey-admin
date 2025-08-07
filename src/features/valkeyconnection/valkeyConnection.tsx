@@ -32,8 +32,6 @@ export function Connection() {
                         <button onClick={() => dispatch(valkeySetConnected(false))}>Disconnect</button>
                     </div>
                 </div>
-
-
                 :
                 <form onSubmit={handleSubmit}>
                     <div>
