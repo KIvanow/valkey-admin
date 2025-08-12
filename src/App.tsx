@@ -14,7 +14,7 @@ function App() {
   return (
     <>
       <h1>Valkey Boilerplate</h1>
-      <Connection/>
+      <Connection />
     </>
   )
 }

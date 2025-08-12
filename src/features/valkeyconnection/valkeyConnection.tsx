@@ -1,9 +1,19 @@
 
 import { useState } from 'react';
-import { setConnecting as valkeySetConnecting, setConnected as valkeySetConnected, selectStatus, selectConnected } from './valkeyConnectionSlice';
+import { setConnecting as valkeySetConnecting, selectStatus, selectConnected } from './valkeyConnectionSlice';
 import { useAppDispatch } from '../../hooks/hooks';
 import { useSelector } from 'react-redux';
-import { sendPending } from '../valkeycommand/valkeycommandSlice';
+import { Button } from "@/components/ui/button"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { SendCommand } from '../valkeycommand/valkeyCommand';
 
 export function Connection() {
     const dispatch = useAppDispatch();
@@ -11,7 +21,6 @@ export function Connection() {
     const [port, setPort] = useState('6379')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [text, setText] = useState('')
 
     const valkeyconnectionStatus = useSelector(selectStatus)
     const valkeyConnected = useSelector(selectConnected)
@@ -23,42 +32,67 @@ export function Connection() {
 
     return (
         <div>
-            <p>Connection status: {valkeyconnectionStatus} </p>
-            {valkeyConnected ?
-                <div>
-                    <input type='text' value={text} onChange={(e) => setText(e.target.value)} />
-                    <button onClick={() => dispatch(sendPending({ command: text, pending: true }))}>Send</button>
-                    <div>
-                        <button onClick={() => dispatch(valkeySetConnected(false))}>Disconnect</button>
-                    </div>
-                </div>
-                :
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label>Host *</label>
-                        <input type="text" value={host} onChange={e => setHost(e.target.value)} required />
-                    </div>
-                    <div>
-                        <label>Port *</label>
-                        <input type="text" value={port} onChange={e => setPort(e.target.value)} required />
-                    </div>
-                    <div>
-                        <label>Username (optional)</label>
-                        <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
-                    </div>
-                    <div>
-                        <label>Password (optional):</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-                    <div>
-                        <button type="submit" >Connect</button>
-                    </div>
-                </form>
-            }
+            <header>Connection Status: {valkeyconnectionStatus}</header>
+            <div className="flex items-center justify-center min-h-screen">
+                {valkeyConnected ?
+                    <SendCommand />
+                    :
+                    <Card className="w-full max-w-sm">
+                        <CardHeader>
+                            <CardTitle>Connect to Valkey</CardTitle>
+                            <CardDescription>
+                                Enter your server's host and port to connect.
+                            </CardDescription>
+
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={handleSubmit}>
+                                <div className="flex flex-col gap-6">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="host">Host</Label>
+                                        <Input
+                                            id="host"
+                                            type="text"
+                                            value={host}
+                                            placeholder="localhost"
+                                            required
+                                            onChange={e => setHost(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="port">Port</Label>
+                                        <Input
+                                            id="port"
+                                            type="number"
+                                            value={port}
+                                            placeholder="6379"
+                                            required
+                                            onChange={e => setPort(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <div className="flex items-center">
+                                            <Label htmlFor="username">Username</Label>
+                                        </div>
+                                        <Input id="username" type="username" onChange={e => setUsername(e.target.value)} />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <div className="flex items-center">
+                                            <Label htmlFor="password">Password</Label>
+                                        </div>
+                                        <Input id="password" type="password" onChange={(e) => setPassword(e.target.value)} />
+                                    </div>
+                                </div>
+                                <div className="grid gap-2 mt-8">
+                                    <Button type="submit" className="w-full">
+                                        Connect
+                                    </Button>
+                                </div>
+                            </form>
+                        </CardContent>
+                    </Card>
+                }
+            </div>
         </div>
 
     )
