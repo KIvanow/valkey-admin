@@ -1,11 +1,10 @@
 import './css/App.css'
-import { Connection } from './features/valkeyconnection/valkeyConnection'
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
 import { setConnecting } from './features/wsconnection/wsConnectionSlice';
-import { selectConnected, selectStatus } from './features/valkeyconnection/valkeyConnectionSlice';
-import { SendCommand } from './features/valkeycommand/valkeyCommand';
+import { SidebarProvider } from './components/ui/sidebar';
+import { AppSidebar } from './components/ui/app-sidebar';
+import { Outlet } from 'react-router';
 
 
 
@@ -16,19 +15,16 @@ function App() {
     dispatch(setConnecting(true))
   }, [dispatch])
 
-  const valkeyConnected = useSelector(selectConnected)
-  const valkeyconnectionStatus = useSelector(selectStatus)
+
+
 
   return (
-    <>
-      <header>Connection Status: {valkeyconnectionStatus}</header>
-      <h1>Valkey Boilerplate</h1>
-      {valkeyConnected ?
-        <SendCommand />
-        :
-        <Connection />
-      }
-    </>
+    <SidebarProvider>
+      <div className="flex min-h-screen app-container">
+        <AppSidebar />
+        <Outlet />
+      </div>
+    </SidebarProvider>
   )
 }
 

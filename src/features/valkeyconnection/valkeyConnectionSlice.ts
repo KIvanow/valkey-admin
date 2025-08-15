@@ -4,6 +4,7 @@ import type { RootState } from "../../store";
 export const selectStatus = (state: RootState) => state.valkeyconnection.status
 export const selectConnected = (state: RootState) => state.valkeyconnection.connected
 export const selectConnecting = (state: RootState) => state.valkeyconnection.connecting
+export const selectRedirected = (state: RootState) => state.valkeyconnection.hasRedirected
 
 const valkeyConnectionSlice = createSlice({
     name: 'valkeyconnection',
@@ -11,6 +12,7 @@ const valkeyConnectionSlice = createSlice({
         status: "Not Connected",
         connected: false,
         connecting: false,
+        hasRedirected: false
     },
     reducers: {
         setConnected: (state, action) => {
@@ -24,9 +26,12 @@ const valkeyConnectionSlice = createSlice({
         },
         setError: (state, action) => {
             state.status = "Error" + action.payload
+        },
+        setRedirected: (state, action) => {
+            state.hasRedirected = action.payload
         }
     }
 })
 
 export default valkeyConnectionSlice.reducer
-export const { setConnected, setConnecting, setError } = valkeyConnectionSlice.actions
+export const { setConnected, setConnecting, setError, setRedirected } = valkeyConnectionSlice.actions

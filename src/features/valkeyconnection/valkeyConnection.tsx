@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { setConnecting as valkeySetConnecting } from './valkeyConnectionSlice';
+import { useState, useEffect } from 'react';
+import { selectConnected, selectRedirected, setRedirected, setConnecting as valkeySetConnecting } from './valkeyConnectionSlice';
 import { useAppDispatch } from '../../hooks/hooks';
 import { Button } from "@/components/ui/button"
 import {
@@ -12,18 +12,32 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 
 export function Connection() {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate()
     const [host, setHost] = useState('localhost')
     const [port, setPort] = useState('6379')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
+    const isConnected = useSelector(selectConnected)
+
+    const hasRedirected = useSelector(selectRedirected)
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         dispatch(valkeySetConnecting({ status: true, host, port, username, password }))
     }
+
+    useEffect(() => {
+        if (isConnected && !hasRedirected) {
+            dispatch(setRedirected(true))
+            navigate('/dashboard')
+        }
+    }, [isConnected, navigate, hasRedirected, dispatch])
 
     return (
         <div>
