@@ -43,7 +43,7 @@ export function SendCommand() {
             {error && (
                 <pre className="rounded-md bg-red-100 border border-red-400 text-red-800 p-4 overflow-x-auto text-left max-w-[600px] mx-auto">
                     <code className="text-sm font-mono whitespace-pre-wrap break-words">
-                        {error}
+                        {error['message']}
                     </code>
                 </pre>
             )}

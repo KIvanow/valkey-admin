@@ -83,8 +83,6 @@ async function setDashboardData(client: GlideClient, ws: WebSocket) {
         return acc
     })
 
-    console.log(info)
-
     ws.send(JSON.stringify({
         type: setData.type,
         payload: {
@@ -108,6 +106,7 @@ async function sendValkeyRunCommand(client: GlideClient, ws: WebSocket, payload)
     try {
         const rawResponse = await client.customCommand(payload.command.split(" ")) as string;
         const response = parseInfo(rawResponse)
+        console.log("Raw response is: ", rawResponse)
         if (rawResponse.includes("ResponseError")) {
             ws.send(JSON.stringify({
                 type: sendFailed.type,

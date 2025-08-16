@@ -1,8 +1,9 @@
 import { type PayloadAction, type Middleware } from '@reduxjs/toolkit';
 import { setError as setError, selectConnected, selectConnecting, setConnecting, setConnected } from '../../features/valkeyconnection/valkeyConnectionSlice';
 import { getSocket } from '../ws/wsMiddleware';
-import { sendFailed, sendFulfilled, sendPending } from '../../features/valkeycommand/valkeycommandSlice';
+import { sendFailed, sendPending } from '../../features/valkeycommand/valkeycommandSlice';
 import { setData } from '@/features/valkeyinfo/valkeyInfoSlice';
+import { toast } from 'sonner';
 
 export const valkeyMiddleware: Middleware = store => next => async (action) => {
     const socket = getSocket();
@@ -20,6 +21,11 @@ export const valkeyMiddleware: Middleware = store => next => async (action) => {
 
                 if (action.type === setConnected.type) {
                     store.dispatch(action)
+                }
+
+                if (action.type === setError.type) {
+                    toast.error(action.payload.message)
+                    store.dispatch(setError(action.payload));
                 }
             }
         }
@@ -39,9 +45,8 @@ export const valkeyMiddleware: Middleware = store => next => async (action) => {
 
                 console.log("Received response from Valkey: ", action.payload)
 
-                if (action.type === sendFulfilled.type) {
-                    store.dispatch(action)
-                }
+                store.dispatch(action)
+
             }
         }
         catch (e) {
@@ -53,7 +58,6 @@ export const valkeyMiddleware: Middleware = store => next => async (action) => {
         socket.send(JSON.stringify({ type: setData.type }))
         socket.onmessage = (message) => {
             const action = JSON.parse(message.data);
-
 
             if (action.type === setData.type) {
                 store.dispatch(action)

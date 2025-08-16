@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { type RootState } from "@/store";
+import type { RootState } from "../../store";
 
 
 export const selectResponse = (state: RootState) => state.valkeycommand.response
@@ -15,10 +15,12 @@ const valkeycommandSlice = createSlice({
     },
     reducers: {
         sendFulfilled: (state, action) => {
+            state.error = null
             state.response = action.payload
             state.pending = false
         },
         sendPending: (state, action) => {
+            state.error = null
             state.lastCommand = action.payload.command
             state.pending = action.payload.pending
             state.response = null

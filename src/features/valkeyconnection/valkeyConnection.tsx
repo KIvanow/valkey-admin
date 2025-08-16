@@ -24,7 +24,6 @@ export function Connection() {
     const [password, setPassword] = useState('')
 
     const isConnected = useSelector(selectConnected)
-
     const hasRedirected = useSelector(selectRedirected)
 
     const handleSubmit = (e: React.FormEvent) => {
