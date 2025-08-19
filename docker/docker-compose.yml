@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  valkey:
+    build: .
+    container_name: valkey-json-container2
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+    restart: unless-stopped
+
+volumes:
+  valkey_data:
