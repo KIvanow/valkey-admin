@@ -21,6 +21,7 @@ export function SendCommand() {
     const onSubmit = () => {
         dispatch(sendRequested({ command: text }))
         setCommandIndex(length)
+        setText("")
     }
 
     const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
