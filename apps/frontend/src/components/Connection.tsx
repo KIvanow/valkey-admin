@@ -57,7 +57,7 @@ export function Connection() {
         <h1 className="text-xl font-bold text-gray-700">Connections</h1>
         <button
           onClick={() => setShowConnectionForm(!showConnectionForm)}
-          className="bg-[#6883fe] text-white px-2 rounded text-sm font-light py-1 cursor-pointer"
+          className="bg-tw-primary text-white px-2 rounded text-sm font-light py-1 cursor-pointer"
         >
           + Add Connection
         </button>
@@ -129,7 +129,7 @@ export function Connection() {
       )}
       {/* Connected DBs */}
       <div className="border-t-1 mt-8">
-        <table className=" min-w-full table-auto divide-y divide-gray-200">
+        <table className="min-w-full table-auto divide-y divide-gray-200">
           <thead className="text-sm bg-gray-50 sticky top-0 z-10">
             <tr className="">
               <th scope="col" className="font-medium text-start">
