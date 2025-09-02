@@ -1,33 +1,35 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {VALKEY} from "@common/src/constants.ts"
+import { VALKEY } from "@common/src/constants.ts"
 
 const connectionSlice = createSlice({
     name: VALKEY.CONNECTION.name,
     initialState: {
-        status: "Not Connected",
-        connected: false,
-        connecting: false,
+        status: "Idle",
+        errorMessage: null,
         hasRedirected: false
     },
     reducers: {
-        setConnected: (state, action) => {
-            state.status = action.payload.status ? "Connected" : "Not Connected"
-            state.connected = action.payload.status
-            state.connecting = action.payload.status ? false : state.connecting
+        connectPending: (state, action) => {
+            state.status = "Connecting";
+            state.errorMessage = null;
         },
-        setConnecting: (state, action) => {
-            state.status = "Connecting..."
-            state.connecting = action.payload.status
+        connectFulfilled: (state) => {
+            state.status = "Connected";
+            state.errorMessage = null;
         },
-        setError: (state, action) => {
-            state.status = "Error" + action.payload
-            state.connecting = false
+        connectRejected: (state, action) => {
+            state.status = "Error";
+            state.errorMessage = action.payload || "Unknown error";
         },
         setRedirected: (state, action) => {
-            state.hasRedirected = action.payload
+            state.hasRedirected = action.payload;
+        },
+        resetConnection: (state) => {
+            state.status = "Idle";
+            state.errorMessage = null;
         }
     }
 })
 
 export default connectionSlice.reducer
-export const { setConnected, setConnecting, setError, setRedirected } = connectionSlice.actions
+export const { connectPending, connectFulfilled, connectRejected, setRedirected, resetConnection } = connectionSlice.actions

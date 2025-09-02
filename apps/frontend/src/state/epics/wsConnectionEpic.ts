@@ -9,18 +9,19 @@ import {
     filter
 } from 'rxjs/operators'
 import {
-    setConnected,
-    setConnecting,
-    setError,
+    connectFulfilled,
+    connectPending,
+    connectRejected,
 } from '@/state/wsconnection/wsConnectionSlice'
 import { action$ } from '../middleware/rxjsMiddleware/rxjsMiddlware'
 import type { PayloadAction, Store } from '@reduxjs/toolkit'
+import { VALKEY } from "@common/src/constants.ts"
 
 let socket$: WebSocketSubject<PayloadAction> | null = null;
 
 export const wsConnectionEpic = (store: Store) =>
     action$.pipe(
-        filter((action) => action.type === setConnecting.type),
+        filter((action) => action.type === connectPending.type),
         mergeMap(() => {
             if (socket$) {
                 return EMPTY
@@ -32,13 +33,12 @@ export const wsConnectionEpic = (store: Store) =>
                 openObserver: {
                     next: () => {
                         console.log('Socket Connection opened')
-                        store.dispatch(setConnected(true))
+                        store.dispatch(connectFulfilled())
                     }
                 },
                 closeObserver: {
                     next: (closeEvent) => {
                         console.log('Socket Connection closed', closeEvent)
-                        store.dispatch(setConnected(false))
                     }
                 }
             })
@@ -50,14 +50,15 @@ export const wsConnectionEpic = (store: Store) =>
                 ignoreElements(),
                 takeUntil(
                     action$.pipe(
-                        filter((action) => action.type === 'wsconnection/disconnect'), // Need to fix this
+                        filter((action) => action.type === VALKEY.CONNECTION.closeConnection),
                         tap(() => {
+                            console.log('Socket Connection closed')
                             socket$?.complete();
                             socket$ = null;
                         })
                     )
                 ),
-                catchError((err) => of(setError(err)))
+                catchError((err) => of(connectRejected(err)))
             );
         })
     )

@@ -1,23 +1,30 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const wsConnectionSlice = createSlice({
-    name: 'wsconnection',
+    name: "wsconnection",
     initialState: {
-        status: "Not Connected"
+        status: "Idle",
+        errorMessage: null,
     },
     reducers: {
-        setConnected: (state, action) => {
-            state.status = action.payload ? "Connected" : "Not Connected"
-
+        connectPending: (state) => {
+            state.status = "Connecting";
+            state.errorMessage = null;
         },
-        setConnecting: (state, action) => {
-            state.status = action.payload.status ? "Connecting..." : "Not Connected"
+        connectFulfilled: (state) => {
+            state.status = "Connected";
+            state.errorMessage = null;
         },
-        setError: (state, action) => {
-            state.status = "Connection Failed: " + action.payload
+        connectRejected: (state, action) => {
+            state.status = "Error";
+            state.errorMessage = action.payload || "Unknown error";
+        },
+        resetConnection: (state) => {
+            state.status = "Idle";
+            state.errorMessage = null;
         }
     }
 })
 
 export default wsConnectionSlice.reducer
-export const { setConnected, setConnecting, setError } = wsConnectionSlice.actions
+export const { connectPending, connectFulfilled, connectRejected, resetConnection } = wsConnectionSlice.actions
