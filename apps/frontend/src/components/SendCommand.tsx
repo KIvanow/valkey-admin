@@ -54,7 +54,6 @@ export function SendCommand() {
                 {JSON.stringify(error ?? response, null, 4)}
             </code>
         </pre>
-
         <div
           className="flex flex-col whitespace-pre-wrap break-words bg-muted rounded-md p-4 font-mono gap-2 w-60 relative">
           <h3 className="text-muted-foreground sticky top-0">History</h3>
