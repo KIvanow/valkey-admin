@@ -1,14 +1,15 @@
 import type { Store } from "@reduxjs/toolkit"
 import { merge } from "rxjs"
-import { ignoreElements, tap, delay } from "rxjs/operators"
+import { ignoreElements, tap} from "rxjs/operators"
 import * as R from "ramda"
 import { getSocket } from "./wsEpics"
-import { connectFulfilled, connectPending } from "../valkey-features/connection/connectionSlice"
+import { connectFulfilled, connectPending} from "../valkey-features/connection/connectionSlice"
 import { sendRequested } from "../valkey-features/command/commandSlice"
 import { setData } from "../valkey-features/info/infoSlice"
 import { action$, select } from "../middleware/rxjsMiddleware/rxjsMiddlware"
 import { atId } from "@/state/valkey-features/connection/connectionSelectors.ts"
 import { LOCAL_STORAGE, NOT_CONNECTED } from "@common/src/constants.ts"
+import { toast } from 'sonner';
 
 export const connectionEpic = (store: Store) =>
   merge(
@@ -38,15 +39,14 @@ export const connectionEpic = (store: Store) =>
             JSON.stringify,
             (updated) => localStorage.setItem(LOCAL_STORAGE.VALKEY_CONNECTIONS, updated)
           )(store.getState())
+          toast.success('Connected to server successfully!')
         } catch (e) {
-          alert("JSON.parse must've failed. See dev console.")
+          toast.error('Connection to server failed!')
           console.error(e)
         }
       }),
-      // todo maybe dispatch an event to show a success animation/message?
     ),
   )
-
 
 export const sendRequestEpic = () =>
   action$.pipe(
