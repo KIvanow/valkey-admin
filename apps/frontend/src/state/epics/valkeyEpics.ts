@@ -1,9 +1,9 @@
 import type { Store } from "@reduxjs/toolkit"
 import { merge } from "rxjs"
-import { ignoreElements, tap, delay } from "rxjs/operators"
+import { ignoreElements, tap} from "rxjs/operators"
 import * as R from "ramda"
 import { getSocket } from "./wsEpics"
-import { connectFulfilled, connectPending, closeConnection } from "../valkey-features/connection/connectionSlice"
+import { connectFulfilled, connectPending} from "../valkey-features/connection/connectionSlice"
 import { sendRequested } from "../valkey-features/command/commandSlice"
 import { setData } from "../valkey-features/info/infoSlice"
 import { action$, select } from "../middleware/rxjsMiddleware/rxjsMiddlware"
@@ -47,7 +47,6 @@ export const connectionEpic = (store: Store) =>
       }),
     ),
   )
-
 
 export const sendRequestEpic = () =>
   action$.pipe(
