@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
 import { VALKEY } from "@common/src/constants.ts"
+import * as R from "ramda"
 
 interface ConnectionData {
     total_commands_processed: number | null
@@ -49,18 +50,19 @@ const infoSlice = createSlice({
             state[connectionId].lastUpdated = timestamp
         },
         setData: (state, action) => {
-            const { connectionId, info, memory } = action.payload
+            const { connectionId } = action.payload
             if (!state[connectionId]) {
                 state[connectionId] = createInitialConnectionState()
             }
-
-            state[connectionId].data.total_commands_processed = info["total_commands_processed"]
-            state[connectionId].data.connected_clients = info['connected_clients']
-            state[connectionId].data.dataset_bytes = memory['dataset.bytes']
-            state[connectionId].data.keys_count = memory['keys.count']
-            state[connectionId].data.bytes_per_key = memory['keys.bytes-per-key']
-            state[connectionId].data.server_name = info['server_name']
-            state[connectionId].data.tcp_port = info['tcp_port']
+            state[connectionId].data = R.applySpec({
+                dataset_bytes: R.path(["memory", "dataset.bytes"]),
+                keys_count: R.path(["memory", "keys.count"]),
+                bytes_per_key: R.path(["memory", "keys.bytes-per-key"]),
+                server_name: R.path(["info", "server_name"]),
+                tcp_port: R.path(["info", "tcp_port"]),
+                total_commands_processed: R.path(["info", "total_commands_processed"]),
+                connected_clients: R.path(["info", "connected_clients"])
+            })(action.payload)
         },
         setError: (state, action) => {
             const { connectionId, error } = action.payload
