@@ -43,6 +43,7 @@
   --color-tw-dark-primary: var(--tw-dark-primary);
   --color-tw-dark-border: var(--tw-dark-border);
   --color-tw-accent: var(--tw-accent);
+  --color-tw-accent2: var(--tw-accent2);
 }
 
 :root {
@@ -82,6 +83,7 @@
   --tw-dark-primary: oklch(21% 0.034 264.665);
   --tw-dark-border: oklch(55.1% 0.027 264.364);
   --tw-accent: rgba(86, 118, 248, 0.5);
+  --tw-accent2: rgba(255, 136, 138, 0.4); 
 }
 
 .dark {

@@ -32,3 +32,10 @@ export const selectKeyType = (id: string, key: string | null | undefined) => (st
   return keys.find(k => k.key === key)?.type;
 };
 
+export const selectKeyTTL = (id: string, key: string | null | undefined) => (state: RootState) => {
+  if (!key) return undefined;
+  
+  const keys = selectKeys(id)(state);
+  return keys.find(k => k.key === key)?.ttl;
+};
+

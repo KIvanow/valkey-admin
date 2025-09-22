@@ -71,12 +71,14 @@ const keyBrowserSlice = createSlice({
       connectionId: string
       key: string
       keyType: string 
+      ttl: number
     }>) => {
-      const { connectionId, key, keyType } = action.payload
+      const { connectionId, key, keyType, ttl } = action.payload
       if (state[connectionId]) {
         const existingKey = state[connectionId].keys.find(k => k.key === key)
         if (existingKey) {
           existingKey.type = keyType
+          existingKey.ttl = ttl
         }
         delete state[connectionId].keyTypeLoading[key]
       }

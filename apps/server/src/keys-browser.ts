@@ -46,20 +46,24 @@ export async function getKeys(client: GlideClient, ws: WebSocket, payload: {
     }
   }
 
-  export async function getKeyType(client: GlideClient, ws: WebSocket, payload: {
+  export async function getKeyInfo(client: GlideClient, ws: WebSocket, payload: {
     connectionId: string
     key: string
   }) {
     try {
-      // TYPE command is used to get the type of a key
-      const keyType = await client.customCommand(["TYPE", payload.key]) as string
+      // TYPE and TTL commands for getting key type and ttl
+      const [keyType, ttl] = await Promise.all([
+        client.customCommand(["TYPE", payload.key]) as Promise<string>,
+        client.customCommand(["TTL", payload.key]) as Promise<number>
+      ])
       
       ws.send(JSON.stringify({
         type: VALKEY.KEYS.getKeyTypeFulfilled,
         payload: {
           connectionId: payload.connectionId,
           key: payload.key,
-          keyType: keyType
+          keyType: keyType,
+          ttl: ttl
         }
       }))
     } catch (err) {

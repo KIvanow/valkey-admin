@@ -9,10 +9,12 @@ import {
   selectLoading,
   selectError,
   selectKeyType,
+  selectKeyTTL,
 } from "@/state/valkey-features/keys/keyBrowserSelectors";
 import { useAppDispatch } from "@/hooks/hooks";
 import { useParams } from "react-router";
 import { AppHeader } from "./ui/app-header";
+import {convertTTL} from "@common/src/ttl-conversion";
 import { Compass, RefreshCcw, Key } from "lucide-react";
 
 interface KeyInfo {
@@ -25,10 +27,11 @@ export function KeyBrowser() {
   const dispatch = useAppDispatch();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
-  const keys : KeyInfo[] = useSelector(selectKeys(id!));
+  const keys: KeyInfo[] = useSelector(selectKeys(id!));
   const loading = useSelector(selectLoading(id!));
   const error = useSelector(selectError(id!));
-  const selectedKeyType = useSelector(selectKeyType(id!, selectedKey!));
+  const selectedKeyType = useSelector(selectKeyType(id!, selectedKey));
+  const selectedKeyTTL = useSelector(selectKeyTTL(id!, selectedKey));
 
   useEffect(() => {
     if (id) {
@@ -104,7 +107,7 @@ export function KeyBrowser() {
                 {keys.map((keyInfo: { key: string }, index) => (
                   <li
                     key={index}
-                    className="h-10 p-2 dark:border-tw-dark-border border cursor-pointer rounded flex items-center gap-2"
+                    className="h-10 p-2 dark:border-tw-dark-border border hover:text-tw-primary cursor-pointer rounded flex items-center gap-2"
                     onClick={() => handleKeyClick(keyInfo.key)}
                   >
                     <Key size={16} /> {keyInfo.key}
@@ -114,14 +117,24 @@ export function KeyBrowser() {
             </div>
           )}
         </div>
-        
+
         {/* Key Details */}
         <div className="w-1/2 pl-2">
           <div className="h-full dark:border-tw-dark-border border rounded">
             {selectedKey ? (
               <div className="p-4 text-sm font-light overflow-y-auto flex justify-between items-center">
-                <span className="font-semibold mb-2 flex items-center gap-2"><Key size={16}/>{selectedKey}</span>
-                <span className="bg-tw-accent text-sm px-2 rounded">{selectedKeyType}</span>
+                <span className="font-semibold mb-2 flex items-center gap-2">
+                  <Key size={16} />
+                  {selectedKey}
+                </span>
+                <div className="space-x-2">
+                  <span className="bg-tw-accent2 text-sm px-2 py-1 w-12 rounded">
+                    {convertTTL(selectedKeyTTL)}
+                  </span>
+                  <span className="bg-tw-accent text-sm px-2 py-1 w-12 rounded">
+                    {selectedKeyType}
+                  </span>
+                </div>
               </div>
             ) : (
               <div className="h-full p-4 text-sm font-light flex items-center justify-center text-gray-500">
