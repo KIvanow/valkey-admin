@@ -9,6 +9,7 @@ interface EnrichedKeyInfo {
   ttl: number;
   size: number;
   collectionSize?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   elements?: any; // this can be array, object, or string depending on the key type.
 }
 

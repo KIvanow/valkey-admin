@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { type OperatorFunction, Subject } from "rxjs"
 import { type Action, type Middleware, type PayloadAction } from "@reduxjs/toolkit"
 import { filter } from "rxjs/operators"

@@ -28,7 +28,6 @@ export default tseslint.config([
       globals: globals.browser,
     },
     rules: {
-      "@typescript-eslint/no-explicit-any": "off",
       quotes: ["error", "double"],
       "import/order": [
         "error",

@@ -36,6 +36,7 @@ interface KeyInfo {
   ttl: number;
   size: number;
   collectionSize?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   elements?: any;
 }
 
