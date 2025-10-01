@@ -222,27 +222,72 @@ export async function deleteKey(
   }
 }
 
+// functions for adding different key types
+async function addStringKey(
+  client: GlideClient,
+  key: string,
+  value: string,
+  ttl?: number
+) {
+  if (ttl && ttl > 0) {
+    await client.customCommand(["SETEX", key, ttl.toString(), value]);
+  } else {
+    await client.customCommand(["SET", key, value]);
+  }
+}
+
+async function addHashKey(
+  client: GlideClient,
+  key: string,
+  fields: { field: string; value: string }[],
+  ttl?: number
+) {
+  const hsetCommand = ["HSET", key];
+  fields.forEach(({ field, value }) => {
+    hsetCommand.push(field, value);
+  });
+
+  await client.customCommand(hsetCommand);
+  if (ttl && ttl > 0) {
+    await client.customCommand(["EXPIRE", key, ttl.toString()]);
+  }
+}
+
 export async function addKey(
   client: GlideClient,
   ws: WebSocket,
   payload: {
     connectionId: string;
     key: string;
-    value: string;
+    keyType: string;
+    value?: string; // for string type
+    fields?: { field: string; value: string }[]; // for hash type
+    values?: string[]; // for list, set, zset types
     ttl?: number;
   }
 ) {
   try {
-    if (payload.ttl && payload.ttl > 0) {
-      await client.customCommand([
-        "SETEX",
-        payload.key,
-        payload.ttl.toString(),
-        payload.value,
-      ]);
-    } else {
-      // Use SET if no TTL is provided
-      await client.customCommand(["SET", payload.key, payload.value]);
+    const keyType = payload.keyType.toLowerCase();
+
+    switch (keyType) {
+      case "string":
+        if (!payload.value) {
+          throw new Error("Value is required for string type");
+        }
+        await addStringKey(client, payload.key, payload.value, payload.ttl);
+        break;
+
+      case "hash":
+        if (!payload.fields || payload.fields.length === 0) {
+          throw new Error("Fields are required for hash type");
+        }
+        await addHashKey(client, payload.key, payload.fields, payload.ttl);
+        break;
+
+      // to do: implement other types here
+
+      default:
+        throw new Error(`Unsupported key type: ${payload.keyType}`);
     }
 
     const keyInfo = await getKeyInfo(client, payload.key);

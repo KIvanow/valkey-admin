@@ -173,7 +173,10 @@ const keyBrowserSlice = createSlice({
       action: PayloadAction<{
         connectionId: string;
         key: string;
-        value: string;
+        keyType: string;
+        value?: string;
+        fields?: { field: string; value: string }[];
+        values?: string[];
         ttl?: number;
       }>
     ) => {
@@ -195,7 +198,6 @@ const keyBrowserSlice = createSlice({
       const { connectionId, key } = action.payload;
       if (state[connectionId]) {
         state[connectionId].loading = false;
-        // Add the new key to the keys array
         state[connectionId].keys.push(key);
       }
     },
