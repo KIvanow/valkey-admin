@@ -74,8 +74,19 @@ const connectionSlice = createSlice({
         ...action.payload,
       }
     },
+    deleteConnection: (state, action) => {
+      const { connectionId } = action.payload
+      return R.dissocPath(["connections", connectionId], state)
+    },
   },
 })
 
 export default connectionSlice.reducer
-export const { connectPending, connectFulfilled, connectRejected, closeConnection, updateConnectionDetails } = connectionSlice.actions
+export const { 
+  connectPending, 
+  connectFulfilled, 
+  connectRejected, 
+  closeConnection, 
+  updateConnectionDetails, 
+  deleteConnection, 
+} = connectionSlice.actions
