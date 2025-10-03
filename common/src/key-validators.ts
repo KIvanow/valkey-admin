@@ -58,7 +58,7 @@ export const ListSpec: ValidationRule[] = [
         isNotBlank(field)
       ).length === 0),
     error: "At least one value is required for list type",
-  }
+  },
 ]
 
 export const SetSpec: ValidationRule[] = [
@@ -69,7 +69,7 @@ export const SetSpec: ValidationRule[] = [
         isNotBlank(field)
       ).length === 0),
     error: "At least one value is required for set type",
-  }
+  },
 ]
 
 export const validate = (spec: ValidationRule[]) => (key: ValidationData): string =>
