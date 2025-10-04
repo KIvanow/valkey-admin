@@ -206,7 +206,7 @@ async function discoverCluster(client: GlideClient) {
         }
       }
 
-      const replicas = replicaNodes.map(([replicaHost, replicaPort, replicaId, _]) => ({
+      const replicas = replicaNodes.map(([replicaHost, replicaPort, replicaId]) => ({
         id: replicaId,
         host: replicaHost,
         port: replicaPort,
