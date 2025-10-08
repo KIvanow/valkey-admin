@@ -359,6 +359,7 @@ export async function addKey(
 }
 
 // functions for updatin/editing different key types
+// Note : the update and add functions are quite similar MAYBE can be refactored later
 async function updateStringKey(
   client: GlideClient,
   key: string,

@@ -1,5 +1,4 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
-import { update } from "ramda";
 
 interface KeyInfo {
   name: string;

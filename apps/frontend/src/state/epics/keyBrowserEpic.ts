@@ -6,7 +6,7 @@ import {
   getKeyTypeRequested,
   deleteKeyRequested,
   addKeyRequested,
-  updateKeyRequested,
+  updateKeyRequested
 } from "../valkey-features/keys/keyBrowserSlice"
 import { action$, select } from "../middleware/rxjsMiddleware/rxjsMiddlware"
 
@@ -60,5 +60,5 @@ export const keyBrowserEpic = () =>
         console.log("Sending updateKey request to server...")
         socket.next(action)
       })
-    ),
+    )
   )
