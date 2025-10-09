@@ -10,6 +10,7 @@ import { AppHeader } from "@/components/ui/app-header.tsx"
 import { cn } from "@/lib/utils.ts"
 import { Timestamp } from "@/components/ui/timestamp.tsx"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx"
+import DiffCommands from "@/components/send-command/DiffCommands.tsx"
 
 export function SendCommand() {
   const dispatch = useAppDispatch()
@@ -59,25 +60,38 @@ export function SendCommand() {
           <h3 className="text-muted-foreground sticky top-0 text-right">Response</h3>
           <code className={`text-sm font-mono ${error ? "text-destructive" : "text-muted-foreground"}`}>
             {
-              compareWith ? "gotta compare" :
-              JSON.stringify(error ?? response, null, 4)
+              compareWith ?
+                <DiffCommands
+                  id={id}
+                  indexA={commandIndex}
+                  indexB={compareWith}
+                /> :
+                JSON.stringify(error ?? response, null, 4)
             }
           </code>
         </pre>
         <div
-          className="flex flex-col whitespace-pre-wrap break-words bg-muted rounded p-2 font-mono gap-2 w-80 relative border
+          className="flex flex-col whitespace-pre-wrap break-words bg-muted rounded p-2 font-mono gap-1 w-80 relative border
           dark:border-tw-dark-border">
           <h3 className="text-muted-foreground sticky top-0">History</h3>
           {
             allCommands?.map(({ command, timestamp }, i) =>
-              <div className={cn("flex flex-row text-sm items-center", i === commandIndex && "text-tw-primary")} key={timestamp}>
-                <Timestamp timestamp={timestamp} className="opacity-50" />
+              <div
+                className={cn(
+                  "flex flex-row text-sm items-center py-1 px-2 rounded",
+                  (i === commandIndex) && "bg-tw-primary text-white",
+                  (i === compareWith) && "bg-tw-primary-light",
+                )}
+                key={timestamp}
+              >
+                <Timestamp timestamp={timestamp} className="opacity-70" />
                 <Tooltip delayDuration={2000}>
                   <TooltipTrigger className="flex-1">
                     <div
                       className="truncate text-left cursor-pointer"
                       onClick={() => {
                         setText("")
+                        setCompareWith(null)
                         setCommandIndex(i)
                       }}
                     >
@@ -90,12 +104,14 @@ export function SendCommand() {
                 </Tooltip>
                 <div className="flex flex-row justify-self-end">
                   {
-                    i !== commandIndex && canDiff(i) &&
+                    i !== commandIndex && i !== compareWith && canDiff(i) &&
                     <Tooltip delayDuration={1000}>
                       <TooltipTrigger>
                         <GitCompareIcon
                           className={cn("size-4 ml-2 cursor-pointer hover:text-tw-primary")}
-                          onClick={() => setCompareWith(i)}
+                          onClick={() => {
+                            setCompareWith(i)
+                          }}
                         />
                       </TooltipTrigger>
                       <TooltipContent>
@@ -104,6 +120,7 @@ export function SendCommand() {
                     </Tooltip>
                   }
                   {
+                    compareWith === null &&
                     <Tooltip delayDuration={1000}>
                       <TooltipTrigger>
                         <RotateCwIcon
