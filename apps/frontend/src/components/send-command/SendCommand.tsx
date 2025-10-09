@@ -1,4 +1,4 @@
-import { BanIcon, GitCompareIcon, LayoutDashboard, RotateCwIcon } from "lucide-react"
+import { GitCompareIcon, LayoutDashboard, RotateCwIcon } from "lucide-react"
 import React, { useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import { useParams } from "react-router"
@@ -38,6 +38,12 @@ export function SendCommand() {
     }
   }
 
+  const canDiff = (index) => {
+    const currentCommand = allCommands[commandIndex]
+    const targetCommand = allCommands[index]
+    return currentCommand.command.toLowerCase() === targetCommand.command.toLowerCase()
+  }
+
   const textareaRef = useRef<HTMLTextAreaElement>(null as HTMLTextAreaElement)
 
   return (
@@ -52,7 +58,10 @@ export function SendCommand() {
           className="rounded flex-1 bg-muted p-2 whitespace-pre-wrap break-words overflow-x-auto relative border dark:border-tw-dark-border">
           <h3 className="text-muted-foreground sticky top-0 text-right">Response</h3>
           <code className={`text-sm font-mono ${error ? "text-destructive" : "text-muted-foreground"}`}>
-            {JSON.stringify(error ?? response, null, 4)}
+            {
+              compareWith ? "gotta compare" :
+              JSON.stringify(error ?? response, null, 4)
+            }
           </code>
         </pre>
         <div
@@ -81,7 +90,20 @@ export function SendCommand() {
                 </Tooltip>
                 <div className="flex flex-row justify-self-end">
                   {
-                    compareWith === null &&
+                    i !== commandIndex && canDiff(i) &&
+                    <Tooltip delayDuration={1000}>
+                      <TooltipTrigger>
+                        <GitCompareIcon
+                          className={cn("size-4 ml-2 cursor-pointer hover:text-tw-primary")}
+                          onClick={() => setCompareWith(i)}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Compare with this run
+                      </TooltipContent>
+                    </Tooltip>
+                  }
+                  {
                     <Tooltip delayDuration={1000}>
                       <TooltipTrigger>
                         <RotateCwIcon
@@ -94,30 +116,6 @@ export function SendCommand() {
                       </TooltipContent>
                     </Tooltip>
                   }
-                  <Tooltip delayDuration={1000}>
-                    <TooltipTrigger>
-                      {
-                        i === compareWith ?
-                          <BanIcon
-                            className={cn("size-4 ml-2 cursor-pointer hover:text-tw-primary")}
-                            onClick={() => setCompareWith(null)}
-                          /> :
-                          <GitCompareIcon
-                            className={cn("size-4 ml-2 cursor-pointer hover:text-tw-primary")}
-                            onClick={() => setCompareWith(i)}
-                          />
-                      }
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {
-                        compareWith !== null && i === compareWith
-                          ? "Cancel"
-                          : compareWith === null && compareWith !== i
-                            ? "Compare with another run"
-                            : "Compare with this run"
-                      }
-                    </TooltipContent>
-                  </Tooltip>
                 </div>
               </div>)
           }
@@ -137,7 +135,7 @@ export function SendCommand() {
         />
         <button
           className="h-10 ml-2 px-4 py-2 bg-tw-primary cursor-pointer text-white rounded hover:bg-tw-primary/70"
-          onClick={onSubmit}
+          onClick={() => onSubmit()}
         >
           Send
         </button>
