@@ -96,7 +96,7 @@ export default function KeyDetails({ selectedKey, selectedKeyInfo, conectionId, 
           })),
         }))
       } else if (selectedKeyInfo.type === "list") {
-        // Create listUpdates array with only changed values
+        // creating listUpdates array with only changed values
         const listUpdates = editedListValues
           .map((value, index) => ({
             index,
@@ -111,7 +111,7 @@ export default function KeyDetails({ selectedKey, selectedKeyInfo, conectionId, 
           listUpdates,
         }))
       } else if (selectedKeyInfo.type === "set") {
-        // Create setUpdates array with oldValue and newValue pairs
+        // creating setUpdates array with oldValue and newValue pairs
         const setUpdates = editedSetValues
           .map((newValue, index) => ({
             oldValue: selectedKeyInfo.elements[index],
@@ -130,6 +130,7 @@ export default function KeyDetails({ selectedKey, selectedKeyInfo, conectionId, 
       setEditedValue("")
       setEditedHashValue({})
       setEditedListValues([])
+      setEditedSetValues([])
     }
   }
 
@@ -223,7 +224,7 @@ export default function KeyDetails({ selectedKey, selectedKeyInfo, conectionId, 
                           : "Value"}
                     </th>
                     <th className="">
-                      {isEditable && (selectedKeyInfo.type === "string" || selectedKeyInfo.type === "hash" || selectedKeyInfo.type === "list" || selectedKeyInfo.type === "set") ? (
+                      {isEditable ? (
                         <div className="flex gap-1">
                           <CustomTooltip content="Save">
                             <Button
@@ -247,7 +248,6 @@ export default function KeyDetails({ selectedKey, selectedKeyInfo, conectionId, 
                         <CustomTooltip content="Edit">
                           <Button
                             className="mr-1"
-                            // disabled={selectedKeyInfo.type !== "string" && selectedKeyInfo.type !== "hash" && selectedKeyInfo.type !== "list"}
                             onClick={handleEdit}
                             variant={"ghost"}
                           >
