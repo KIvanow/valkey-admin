@@ -391,6 +391,39 @@ async function updateHashKey(
   }
 }
 
+async function updateListKey(
+  client: GlideClient,
+  key: string,
+  updates: { index: number; value: string }[],
+  ttl?: number
+) {
+  // Update each specified index
+  for (const { index, value } of updates) {
+    await client.customCommand(["LSET", key, index.toString(), value])
+  }
+
+  if (ttl && ttl > 0) {
+    await client.customCommand(["EXPIRE", key, ttl.toString()])
+  }
+}
+
+async function updateSetKey(
+  client: GlideClient,
+  key: string,
+  updates: { oldValue: string; newValue: string }[],
+  ttl?: number
+) {
+  // For each update, remove old value and add new value
+  for (const { oldValue, newValue } of updates) {
+    await client.customCommand(["SREM", key, oldValue])
+    await client.customCommand(["SADD", key, newValue])
+  }
+
+  if (ttl && ttl > 0) {
+    await client.customCommand(["EXPIRE", key, ttl.toString()])
+  }
+}
+
 export async function updateKey(
   client: GlideClient,
   ws: WebSocket,
@@ -400,6 +433,8 @@ export async function updateKey(
     keyType: string;
     value?: string; // for string type
     fields?: { field: string; value: string }[]; // for hash type
+    listUpdates?: { index: number; value: string }[]; // for list type
+    setUpdates?: { oldValue: string; newValue: string }[]; // for set type
     ttl?: number;
   }
 ) {
@@ -421,6 +456,18 @@ export async function updateKey(
         } else {
           throw new Error("Fields are required for hash type")
         }
+      case "list":
+        if (!payload.listUpdates || payload.listUpdates.length === 0) {
+          throw new Error("List updates are required for list type")
+        }
+        await updateListKey(client, payload.key, payload.listUpdates, payload.ttl)
+        break
+      case "set":
+        if (!payload.setUpdates || payload.setUpdates.length === 0) {
+          throw new Error("Set updates are required for set type")
+        }
+        await updateSetKey(client, payload.key, payload.setUpdates, payload.ttl)
+        break
 
       default:
         throw new Error(`Unsupported key type for update: ${payload.keyType}`)
