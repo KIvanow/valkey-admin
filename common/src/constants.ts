@@ -50,6 +50,9 @@ export const VALKEY = {
     addKeyRequested: "addKeyRequested",
     addKeyFulfilled: "addKeyFulfilled",
     addKeyFailed: "addKeyFailed",
+    updateKeyRequested: "updateKeyRequested",
+    updateKeyFulfilled: "updateKeyFulfilled",
+    updateKeyFailed: "updateKeyFailed",
   } as const),
 } as const
 

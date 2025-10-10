@@ -5,7 +5,8 @@ import {
   getKeysRequested,
   getKeyTypeRequested,
   deleteKeyRequested,
-  addKeyRequested
+  addKeyRequested,
+  updateKeyRequested
 } from "../valkey-features/keys/keyBrowserSlice"
 import { action$, select } from "../middleware/rxjsMiddleware/rxjsMiddlware"
 
@@ -18,7 +19,7 @@ export const keyBrowserEpic = () =>
         const socket = getSocket()
         console.log("Sending getKeys request to server...")
         socket.next(action)
-      }),
+      })
     ),
 
     // for getting a key type and ttl (getKeyInfo)
@@ -28,7 +29,7 @@ export const keyBrowserEpic = () =>
         const socket = getSocket()
         console.log("Sending getKeyType request to server...")
         socket.next(action)
-      }),
+      })
     ),
 
     // for deleting a key (deleteKey)
@@ -38,7 +39,7 @@ export const keyBrowserEpic = () =>
         const socket = getSocket()
         console.log("Sending deleteKey request to server...")
         socket.next(action)
-      }),
+      })
     ),
 
     // add new key (addKey)
@@ -48,6 +49,16 @@ export const keyBrowserEpic = () =>
         const socket = getSocket()
         console.log("Sending addKey request to server...")
         socket.next(action)
-      }),
+      })
     ),
+
+    // update existing key (updateKey)
+    action$.pipe(
+      select(updateKeyRequested),
+      tap((action) => {
+        const socket = getSocket()
+        console.log("Sending updateKey request to server...")
+        socket.next(action)
+      })
+    )
   )

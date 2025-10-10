@@ -5,7 +5,8 @@ import {
   getKeys,
   getKeyInfoSingle,
   deleteKey,
-  addKey
+  addKey,
+  updateKey
 } from "./keys-browser.ts"
 
 const wss = new WebSocketServer({ port: 8080 })
@@ -127,7 +128,27 @@ wss.on("connection", (ws: WebSocket) => {
           }),
         )
       }
-    } else {
+    } else if (action.type === VALKEY.KEYS.updateKeyRequested) {
+      console.log("Handling updateKeyRequested for key:", action.payload?.key)
+      const client = clients.get(connectionId)
+      if (client) {
+        await updateKey(client, ws, action.payload)
+      } else {
+        console.log("No client found for connectionId:", connectionId)
+        ws.send(
+          JSON.stringify({
+            type: VALKEY.KEYS.addKeyFailed,
+            payload: {
+              connectionId,
+              key: action.payload?.key,
+              error: "Invalid connection Id",
+            },
+          })
+        )
+      }
+    }
+
+    else {
       console.log("Unknown action type:", action.type)
     }
   })
