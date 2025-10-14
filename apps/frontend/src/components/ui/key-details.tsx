@@ -5,22 +5,51 @@ import { formatBytes } from "@common/src/bytes-conversion"
 import { CustomTooltip } from "./custom-tooltip"
 import { Button } from "./button"
 import DeleteModal from "./delete-modal"
-import { deleteKeyRequested } from "@/state/valkey-features/keys/keyBrowserSlice"
-import { useAppDispatch } from "@/hooks/hooks"
 import KeyDetailsString from "./key-details-string"
 import KeyDetailsHash from "./key-details-hash"
 import KeyDetailsList from "./key-details-list"
 import KeyDetailsSet from "./key-details-set"
+import { useAppDispatch } from "@/hooks/hooks"
+import { deleteKeyRequested } from "@/state/valkey-features/keys/keyBrowserSlice"
 
-interface KeyInfo {
-  name: string;
-  type: string;
-  ttl: number;
-  size: number;
-  collectionSize?: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  elements?: any;
+interface ElementInfo {
+  key: string;
+  value: string;
 }
+
+type KeyInfo = 
+  | {
+    name: string;
+    type: "string";
+    ttl: number;
+    size: number;
+    collectionSize?: number;
+    elements: string;
+  }
+  | {
+    name: string;
+    type: "hash";
+    ttl: number;
+    size: number;
+    collectionSize?: number;
+    elements: ElementInfo[];
+  }
+  | {
+    name: string;
+    type: "list";
+    ttl: number;
+    size: number;
+    collectionSize?: number;
+    elements: string[];
+  }
+  | {
+    name: string;
+    type: "set";
+    ttl: number;
+    size: number;
+    collectionSize?: number;
+    elements: string[];
+  };
 
 interface keyDetailsProps {
   selectedKey: string | null;
@@ -42,8 +71,6 @@ export default function KeyDetails({ selectedKey, selectedKeyInfo, conectionId, 
     setSelectedKey(null)
     handleDeleteModal()
   }
-
-
 
   return (
     <div className="w-1/2 pl-2">
@@ -100,36 +127,36 @@ export default function KeyDetails({ selectedKey, selectedKeyInfo, conectionId, 
               />
             )}
 
-            {/* showing different key types and their elements */}
+            {/* show different key types */}
             {selectedKeyInfo.type === "string" && (
               <KeyDetailsString
-                selectedKey={selectedKey}
-                selectedKeyInfo={selectedKeyInfo as any}
                 connectionId={conectionId}
+                selectedKey={selectedKey}
+                selectedKeyInfo={selectedKeyInfo}
               />
             )}
 
             {selectedKeyInfo.type === "hash" && (
               <KeyDetailsHash
-                selectedKey={selectedKey}
-                selectedKeyInfo={selectedKeyInfo as any}
                 connectionId={conectionId}
+                selectedKey={selectedKey}
+                selectedKeyInfo={selectedKeyInfo}
               />
             )}
 
             {selectedKeyInfo.type === "list" && (
               <KeyDetailsList
-                selectedKey={selectedKey}
-                selectedKeyInfo={selectedKeyInfo as any}
                 connectionId={conectionId}
+                selectedKey={selectedKey}
+                selectedKeyInfo={selectedKeyInfo}
               />
             )}
 
             {selectedKeyInfo.type === "set" && (
               <KeyDetailsSet
-                selectedKey={selectedKey}
-                selectedKeyInfo={selectedKeyInfo as any}
                 connectionId={conectionId}
+                selectedKey={selectedKey}
+                selectedKeyInfo={selectedKeyInfo}
               />
             )}
           </div>
