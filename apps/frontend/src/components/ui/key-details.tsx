@@ -42,7 +42,6 @@ type KeyInfo =
     elements: string[];
   });
 
-
 interface keyDetailsProps {
   selectedKey: string | null;
   setSelectedKey: (key: string | null) => void;
