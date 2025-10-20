@@ -11,7 +11,7 @@ import Settings from "./components/Settings.tsx"
 import LearnMore from "./components/LearnMore.tsx"
 import { KeyBrowser } from "./components/KeyBrowser.tsx"
 import { Cluster } from "./components/Cluster.tsx"
-import { SendCommand } from "@/components/SendCommand.tsx"
+import { SendCommand } from "@/components/send-command/SendCommand.tsx"
 import { Connection } from "@/components/connection/Connection.tsx"
 import "./css/index.css"
 
