@@ -28,3 +28,6 @@ The repository includes settings for the ESLint extension. Please install it.
 **Note:** If you have a formatter i.e. Prettier, it could interfere with the ESLint extension. Please disable it from the workspace.
 
 This requires ESLint v9.0.0 and above.
+
+## Create DMG
+In the root directory, create a dmg by running `npm run package:mac`.
