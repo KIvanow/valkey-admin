@@ -7,17 +7,10 @@ import { Database } from "lucide-react"
 import { AppHeader } from "./ui/app-header"
 import Accordion from "./ui/accordion"
 import { selectData } from "@/state/valkey-features/info/infoSelectors.ts"
-import { selectClusterData } from "@/state/valkey-features/cluster/clusterSelectors"
-import { selectConnectionDetails } from "@/state/valkey-features/connection/connectionSelectors"
 
 export function Dashboard() {
-  const { id, clusterId } = useParams()
+  const { id } = useParams()
   const infoData = useSelector(selectData(id!))
-  const clusterData = useSelector(selectClusterData(clusterId!))
-  const connectionDetails = useSelector(selectConnectionDetails(id!))
-  const nodeAddress = `${connectionDetails.host}:${connectionDetails.port}`
-  console.log("The cluster data is: ", clusterData)
-  console.log("The node address is: ", nodeAddress)
   const [searchQuery, setSearchQuery] = useState("")
 
   const memoryUsageMetrics = {
