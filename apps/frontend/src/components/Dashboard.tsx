@@ -11,8 +11,13 @@ import { selectClusterData } from "@/state/valkey-features/cluster/clusterSelect
 import { selectConnectionDetails } from "@/state/valkey-features/connection/connectionSelectors"
 
 export function Dashboard() {
-  const { id } = useParams()
+  const { id, clusterId } = useParams()
   const infoData = useSelector(selectData(id!))
+  const clusterData = useSelector(selectClusterData(clusterId!))
+  const connectionDetails = useSelector(selectConnectionDetails(id!))
+  const nodeAddress = `${connectionDetails.host}:${connectionDetails.port}`
+  console.log("The cluster data is: ", clusterData)
+  console.log("The node address is: ", nodeAddress)
   const [searchQuery, setSearchQuery] = useState("")
 
   const memoryUsageMetrics = {
