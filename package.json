@@ -12,6 +12,8 @@
     "@eslint/js": "^9.32.0",
     "@stylistic/eslint-plugin": "^5.3.1",
     "concurrently": "^9.2.0",
+    "electron": "^38.4.0",
+    "electron-builder": "^26.0.12",
     "eslint": "^9.32.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react": "^7.37.5",
@@ -22,7 +24,10 @@
   },
   "scripts": {
     "dev": "concurrently \"npm --workspace apps/frontend run dev\" \"npm --workspace apps/server run dev\"",
-    "package-server": "npm --workspace apps/server run bundle",
+    "build:server": "npm --workspace apps/server run build",
+    "build:frontend": "npm --workspace apps/frontend run build",
+    "build:all": "npm run build:server && npm run build:frontend",
+    "package:mac": "npm run build:all && electron-builder --mac --arm64",
     "lint": "eslint ."
   },
   "build": {
@@ -31,18 +36,44 @@
       "output": "release"
     },
     "files": [
-      "apps/frontend/main.js",
+      "apps/frontend/electron.main.js",
       "apps/frontend/dist/**/*",
       "package.json"
     ],
     "extraFiles": [
       {
-        "from": "apps/server/dist/server-bundle.cjs",
-        "to": "bin/server-backend.js"
-      },
-      {
         "from": "node_modules/@valkey",
         "to": "resources/app/node_modules/@valkey"
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "apps/server/dist/server-bundle.cjs",
+        "to": "server-backend.js"
+      },
+      {
+        "from": "node_modules/@valkey/valkey-glide",
+        "to": "node_modules/@valkey/valkey-glide"
+      },
+      {
+        "from": "node_modules/@valkey/valkey-glide-darwin-arm64",
+        "to": "node_modules/@valkey/valkey-glide-darwin-arm64"
+      },
+      {
+        "from": "node_modules/long",
+        "to": "node_modules/long"
+      },
+      {
+        "from": "node_modules/protobufjs",
+        "to": "node_modules/protobufjs"
+      },
+      {
+        "from": "node_modules/@protobufjs",
+        "to": "node_modules/@protobufjs"
+      },
+      {
+        "from": "node_modules/ws",
+        "to": "node_modules/ws"
       }
     ],
     "mac": {

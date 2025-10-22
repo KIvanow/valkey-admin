@@ -1,15 +1,10 @@
 import { defineConfig } from "vite"
 import { resolve } from "path"
 
-import pkg from "./package.json"
-
-const externalPackages = [
-  ...Object.keys(pkg.dependencies || {}),
-]
-
 export default defineConfig({
   build: {
     outDir: "dist",
+    target: "node18",
 
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
@@ -18,7 +13,7 @@ export default defineConfig({
     },
 
     rollupOptions: {
-      external: externalPackages,
+      external: ["@valkey/valkey-glide", "ws"], // Externalize native modules and ws
     },
 
     emptyOutDir: false,
