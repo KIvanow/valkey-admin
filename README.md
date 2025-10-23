@@ -5,7 +5,9 @@
 ### Start Valkey Cluster
 
 1. From the root directory, run `tools/valkey-cluster/scripts/build_run_cluster.sh`.
-    1. This will build and run the cluster, saving the ip address and master ports in `tools/valkey-cluster/cluster_output/master_nodes.txt`.
+    1. This will build and run the cluster.
+    2. Master hostname will be `localhost`.
+    3. Master nodes ports will be `7001` - `7003`.
 
 ### Running the apps
 

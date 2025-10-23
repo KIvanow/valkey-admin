@@ -197,7 +197,6 @@ services:
         networks: [valnet]
         volumes:
             - ./scripts/cluster_init.sh:/usr/local/bin/cluster_init.sh:ro
-            - ./cluster_output:/app/output # Mount host directory for output
         entrypoint: ["/usr/local/bin/cluster_init.sh"]
         restart: "no"
 

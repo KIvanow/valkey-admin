@@ -1,9 +1,6 @@
 # Dependencies
 node_modules/
 
-# Cluster outputs
-cluster_output/
-
 # Build outputs
 build/
 dist/
