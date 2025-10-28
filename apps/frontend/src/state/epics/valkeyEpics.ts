@@ -62,18 +62,18 @@ export const connectionEpic = (store: Store) =>
 export const autoReconnectEpic = (store: Store) =>
   action$.pipe(
     select(wsConnectFulfilled),
-    delay(500), // Small delay to ensure WebSocket is fully established
+    delay(500), // Small delay to ensure WebSocket is fully connected
     tap(() => {
       const state = store.getState()
       const connections = state.valkeyConnection?.connections || {}
 
       // disconnected Valkey connections
       const disconnectedConnections = Object.entries(connections)
-        .filter(([_, connection]) => connection.status === DISCONNECTED)
+        .filter(([, connection]) => connection.status === DISCONNECTED)
 
       if (disconnectedConnections.length > 0) {
-        console.log(`Auto-reconnecting ${disconnectedConnections.length} Valkey connection(s)`)
-        toast.info(`Reconnecting ${disconnectedConnections.length} Valkey connection(s)...`)
+        console.log(`Auto-reconnecting ${disconnectedConnections.length} connection(s)`)
+        toast.info(`Reconnecting ${disconnectedConnections.length} connection(s)...`)
 
         // reconnect each disconnected connection
         disconnectedConnections.forEach(([connectionId, connection]) => {

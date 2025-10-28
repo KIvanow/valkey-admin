@@ -92,7 +92,7 @@ const connect = (store: Store) =>
         }),
         catchError((err) => {
           console.error("WebSocket connection failed permanently:", err)
-          toast.error("Failed to connect after multiple attempts. Please reconnect manually.", {
+          toast.error("Failed to connect after multiple attempts. Reconnect manually in Connections Page.", {
             duration: 7000,
           })
           store.dispatch(reconnectExhausted())

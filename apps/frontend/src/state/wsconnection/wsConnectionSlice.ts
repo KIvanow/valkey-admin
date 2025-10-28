@@ -35,7 +35,7 @@ const wsConnectionSlice = createSlice({
       state.status = CONNECTED
       state.errorMessage = null
     },
-    connectRejected: (state, action: PayloadAction<any>) => {
+    connectRejected: (state, action) => {
       state.status = ERROR
       state.errorMessage = action.payload?.message || "Unknown error"
       state.reconnect.isRetrying = false
