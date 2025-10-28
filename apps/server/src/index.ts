@@ -1,6 +1,5 @@
 import { WebSocket, WebSocketServer } from "ws"
-import {  ClusterResponse, Decoder, GlideClient, GlideClusterClient, InfoOptions } from "@valkey/valkey-glide"
-import * as R from "ramda"
+import {  Decoder, GlideClient, GlideClusterClient } from "@valkey/valkey-glide"
 import { VALKEY } from "../../../common/src/constants.ts"
 import {
   getKeys,
@@ -9,6 +8,8 @@ import {
   addKey,
   updateKey
 } from "./keys-browser.ts"
+import { connectToValkey } from "./connection.ts"
+import { parseInfo, parseClusterInfo } from "./utils.ts"
 
 const wss = new WebSocketServer({ port: 8080 })
 
@@ -181,141 +182,6 @@ wss.on("connection", (ws: WebSocket) => {
   })
 })
 
-async function connectToValkey(
-  ws: WebSocket,
-  payload: {
-    host: string;
-    port: number;
-    connectionId: string;
-  },
-  clients: Map<string, GlideClient | GlideClusterClient>,
-) {
-
-  const addresses = [
-    {
-      host: payload.host,
-      port: payload.port,
-    },
-  ]
-  try {
-    const standaloneClient = await GlideClient.createClient({
-      addresses,
-      requestTimeout: 5000,
-      clientName: "test_client",
-    })
-    console.log("Connected to standalone")
-    clients.set(payload.connectionId, standaloneClient)
-    ws.send(
-      JSON.stringify({
-        type: VALKEY.CONNECTION.connectFulfilled,
-        payload: {
-          connectionId: payload.connectionId,
-        },
-      }),
-    )
-
-    if (await belongsToCluster(standaloneClient)) {
-      return connectToCluster(standaloneClient, ws, clients, payload, addresses)
-    }
-
-    return standaloneClient
-
-  } catch (err) {
-    console.log("Error connecting to Valkey", err)
-    ws.send(
-      JSON.stringify({
-        type: VALKEY.CONNECTION.connectRejected,
-        payload: {
-          err,
-          connectionId: payload.connectionId,
-        },
-      }),
-    )
-    return undefined
-  }
-}
-
-async function belongsToCluster(client: GlideClient): Promise<boolean> {
-  const response = await client.info([InfoOptions.Cluster])
-  const parsed = parseInfo(response)
-  return parsed["cluster_enabled"] === "1"
-}
-
-async function discoverCluster(client: GlideClient) {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response = await client.customCommand(["CLUSTER", "SLOTS"]) as any[][]
-
-    const { clusterId } = R.applySpec({
-      firstSlotRange: R.nth(0),
-      firstPrimaryNode: R.path([0, 2]), // firstSlotRange[2]
-      clusterId: R.path([0, 2, 2]), // firstPrimaryNode[2]
-    })(response)
-
-    const clusterNodes = response.reduce((acc, slotRange) => {
-      const [, , ...nodes] = slotRange
-
-      return nodes.reduce((nodesById, [host, port], idx) => {
-        const id = `${host}-${port}`
-        return nodesById[id]
-          ? nodesById
-          :  { ...nodesById, [id]: { host, port, role: idx === 0 ? "primary" : "replica" } }
-      }, acc)
-    }, {} as Record<string, {
-      host: string;
-      port: number;
-      role: "primary" | "replica";
-    }>)
-
-    return { clusterNodes, clusterId }
-  } catch (err) {
-    console.error("Error discovering cluster:", err)
-    throw new Error("Failed to discover cluster") 
-    
-  }
-}
-
-async function connectToCluster(
-  standaloneClient: GlideClient, 
-  ws: WebSocket, 
-  clients: Map<string, GlideClient | GlideClusterClient>, 
-  payload: { host: string; port: number; connectionId: string;},
-  addresses: { host: string, port: number | undefined }[],
-) {
-  const { clusterNodes, clusterId } = await discoverCluster(standaloneClient)
-  if (R.isEmpty(clusterNodes)) {
-    throw new Error("No cluster nodes discovered")
-  }
-  // May remove this if we agree to remove clusterSlice
-  ws.send(
-    JSON.stringify({
-      type: VALKEY.CLUSTER.addCluster,
-      payload: { clusterId, clusterNodes },
-    }),
-  )
-  const clusterClient = await GlideClusterClient.createClient({
-    addresses,
-    requestTimeout: 5000,
-    clientName: "cluster_client",
-  })
-
-  standaloneClient.close()
-
-  clients.set(payload.connectionId, clusterClient)
-
-  ws.send(
-    JSON.stringify({
-      type: VALKEY.CONNECTION.connectFulfilled,
-      payload: {
-        connectionId: payload.connectionId,
-        clusterNodes,
-        clusterId: clusterId,
-      },
-    }),
-  )
-  return clusterClient
-}
-
 async function setDashboardData(
   connectionId: string,
   client: GlideClient,
@@ -366,96 +232,29 @@ async function setClusterDashboardData(
   )
 }
 
-type ParsedClusterInfo = {
-  [host: string]: {
-    [section: string]: {
-      [key: string]: string
-    }
-  }
-}
-
-export const parseClusterInfo = (rawInfo: ClusterResponse<string>): ParsedClusterInfo =>
-{
-  // Required to satisfy compiler
-  if (typeof rawInfo !== "object" || rawInfo === null) {
-    throw new Error("Invalid ClusterResponse: expected an object with host keys.")
-  }
-  return R.pipe(
-    R.toPairs,
-    R.map(([host, infoString]) =>
-      [
-        host,
-        R.pipe(
-          R.split("\r\n"),
-          R.reduce(
-            (
-              state: { currentSection: string | null; hostData: ParsedClusterInfo[string] },
-              line: string,
-            ) => {
-              const trimmed = line.trim()
-              if (trimmed === "") return state
-
-              if (trimmed.startsWith("# ")) {
-                const section = trimmed.slice(2).trim()
-                state.currentSection = section
-                state.hostData[section] = state.hostData[section] || {}
-                return state
-              }
-
-              if (!state.currentSection) return state
-
-              const idx = line.indexOf(":")
-              if (idx === -1) return state
-
-              const key = line.slice(0, idx)
-              const value = line.slice(idx + 1)
-
-              state.hostData[state.currentSection] = state.hostData[state.currentSection] || {}
-              state.hostData[state.currentSection]![key] = value
-              return state
-            },
-            { currentSection: null, hostData: {} },
-          ),
-          (s: { hostData: ParsedClusterInfo[string] }) => s.hostData,
-        )(infoString as string),
-      ] as [string, ParsedClusterInfo[string]],
-    ),
-    R.fromPairs,
-  )(rawInfo) as ParsedClusterInfo
-}
-  
-const parseInfo = (infoStr: string): Record<string, string> =>
-  infoStr.split("\n").reduce((acc, line) => {
-    if (!line || line.startsWith("#") || !line.includes(":")) return acc
-    const [key, value] = line.split(":").map((part) => part.trim())
-    acc[key] = value
-    return acc
-  }, {} as Record<string, string>)
-
 async function sendValkeyRunCommand(
   client: GlideClient | GlideClusterClient,
   ws: WebSocket,
   payload: { command: string; connectionId: string },
 ) {
   try {
-    const rawResponse = (await client.customCommand(
+    let response = (await client.customCommand(
       payload.command.split(" "),
-    )) as string
+    ))
 
-    // todo fixme!!! they are not all strings!
-    const response =
-      typeof rawResponse === "string"
-        ? parseInfo(rawResponse)
-        : rawResponse
-    if (rawResponse.includes("ResponseError")) {
-      ws.send(
-        JSON.stringify({
-          meta: { command: payload.command },
-          type: VALKEY.COMMAND.sendFailed,
-          payload: rawResponse,
-        }),
-      )
+    if (typeof response === "string") {
+      if (response.includes("ResponseError")) {
+        ws.send(
+          JSON.stringify({
+            meta: { command: payload.command },
+            type: VALKEY.COMMAND.sendFailed,
+            payload: response,
+          }),
+        )
+      }
+      response = parseInfo(response)
     }
+
     ws.send(
       JSON.stringify({
         meta: {
