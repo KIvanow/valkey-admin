@@ -10,7 +10,6 @@ import {
   retry
 } from "rxjs/operators"
 import { CONNECTED, VALKEY, WS_RETRY_CONFIG, retryDelay } from "@common/src/constants.ts"
-import { toast } from "sonner"
 import { action$ } from "../middleware/rxjsMiddleware/rxjsMiddlware"
 import type { PayloadAction, Store } from "@reduxjs/toolkit"
 import { connectionBroken } from "@/state/valkey-features/connection/connectionSlice"
@@ -75,11 +74,6 @@ const connect = (store: Store) =>
 
             const delay = retryDelay(retryCount - 1)
 
-            toast.info(
-              `Connection lost. Retrying in ${delay / 1000}s... (Attempt ${retryCount}/${WS_RETRY_CONFIG.MAX_RETRIES})`,
-              { duration: delay },
-            )
-
             store.dispatch(reconnectAttempt({
               attempt: retryCount,
               maxRetries: WS_RETRY_CONFIG.MAX_RETRIES,
@@ -92,9 +86,6 @@ const connect = (store: Store) =>
         }),
         catchError((err) => {
           console.error("WebSocket connection failed permanently:", err)
-          toast.error("Failed to connect after multiple attempts. Reconnect manually in Connections Page.", {
-            duration: 7000,
-          })
           store.dispatch(reconnectExhausted())
           store.dispatch(connectRejected(err))
           return EMPTY
