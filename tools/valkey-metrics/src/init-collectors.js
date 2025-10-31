@@ -1,4 +1,5 @@
 import { makeFetcher } from "./effects/fetchers.js"
+import { makeHotkeysFetcher } from "./effects/hotkeys-fetcher.js"
 import { makeNdjsonWriter } from "./effects/ndjson-writer.js"
 import { startCollector } from "./epics/collector-rx.js"
 import { loadConfig } from "./config.js"
@@ -12,7 +13,8 @@ const setupCollectors = async client => {
 
   // here we start data collection epics per each config with corresponding stat fetchers
   for (const f of cfg.epics) {
-    const fn = fetcher[f.type]
+    let fn
+    f.type === "hotkeys" ? fn = makeHotkeysFetcher(client) : fn = fetcher[f.type]
     if (!fn) {
       console.warn(`unknown epic type ${f.type} for ${f.name}, skipping`)
       continue

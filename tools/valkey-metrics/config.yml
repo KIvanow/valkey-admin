@@ -30,3 +30,8 @@ epics:
     type: "slowlog_len"
     poll_ms: 60000
     file_prefix: "slowlog_len"
+  
+  - name: "hotkeys"
+    type: "hotkeys"
+    poll_ms: 60000
+    file_prefix: "hotkeys"

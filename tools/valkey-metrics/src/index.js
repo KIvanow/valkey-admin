@@ -67,6 +67,15 @@ app.get('/slowlog_len', async (_req, res) => {
   }
 })
 
+app.get('/hotkeys', async (_req, res) => {
+  try {
+    const rows = await Reader.hotkeys();
+    res.json({ rows });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 const port = Number(cfg.server.port || 3000)
 const server = app.listen(port, () => {
   console.log(`listening on http://0.0.0.0:${port}`)
