@@ -40,7 +40,6 @@ const AppWithHistory = () => {
 
         {/* Routes with clusterId */}
         <Route element={<RequireConnection />}>
-          <Route element={<ValkeyReconnect />} path="/:clusterId/:id/valkey-reconnect" />
           <Route element={<Dashboard />} path="/:clusterId/:id/dashboard" />
           <Route element={<SendCommand />} path="/:clusterId/:id/sendcommand" />
           <Route element={<KeyBrowser />} path="/:clusterId/:id/browse" />

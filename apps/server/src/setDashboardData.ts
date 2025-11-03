@@ -51,31 +51,17 @@ export async function setClusterDashboardData(
   clusterId: string,
   client: GlideClusterClient,
   ws: WebSocket,
-  connectionId: string,
 ) {
-  try {
-    const rawInfo = await client.info({ route:"allNodes" })
-    const info = parseClusterInfo(rawInfo)
-
-    ws.send(
-      JSON.stringify({
-        type: VALKEY.CLUSTER.setClusterData,
-        payload: {
-          clusterId,
-          info: info,
-        },
-      }),
-    )
-  } catch (err) {
-    console.error(`Valkey cluster connection error for ${connectionId}:`, err)
-    ws.send(
-      JSON.stringify({
-        type: VALKEY.CONNECTION.connectRejected,
-        payload: {
-          connectionId,
-          errorMessage: "Failed to fetch cluster data - Valkey cluster could be down",
-        },
-      }),
-    )
-  }
+  const rawInfo = await client.info({ route:"allNodes" })
+  const info = parseClusterInfo(rawInfo)
+  
+  ws.send(
+    JSON.stringify({
+      type: VALKEY.CLUSTER.setClusterData,
+      payload: {
+        clusterId,
+        info: info,
+      },
+    }),
+  )
 }

@@ -9,23 +9,22 @@ import { connectPending } from "@/state/valkey-features/connection/connectionSli
 export function ValkeyReconnect() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { id: connectionId, clusterId } = useParams<{ id: string; clusterId?: string }>()
+  const { id } = useParams()
 
   const connection = useSelector((state: RootState) =>
-    state.valkeyConnection?.connections?.[connectionId!],
+    state.valkeyConnection?.connections?.[id!],
   )
 
   const { status, errorMessage, reconnect } = connection || {}
 
   useEffect(() => {
-    // Redirect to dashboard on successful connection
+    // Redirect to dashboard or previous location on successful connection
     if (status === CONNECTED) {
-      const redirectTo = sessionStorage.getItem(`valkey-previous-${connectionId}`) ||
-        (clusterId ? `/${clusterId}/${connectionId}/dashboard` : `/${connectionId}/dashboard`)
-      sessionStorage.removeItem(`valkey-previous-${connectionId}`)
+      const redirectTo = sessionStorage.getItem(`valkey-previous-${id}`) || (`/${id}/dashboard`)
+      sessionStorage.removeItem(`valkey-previous-${id}`)
       navigate(redirectTo, { replace: true })
     }
-  }, [status, navigate, connectionId, clusterId])
+  }, [status, navigate, id])
 
   // Redirect to connection page if connection doesn't exist
   useEffect(() => {
@@ -39,7 +38,7 @@ export function ValkeyReconnect() {
 
     const { host, port, username, password } = connection.connectionDetails
     dispatch(connectPending({
-      connectionId: connectionId!,
+      connectionId: id!,
       host,
       port,
       username,

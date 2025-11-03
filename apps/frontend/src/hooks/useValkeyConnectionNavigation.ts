@@ -8,16 +8,16 @@ import type { RootState } from "@/store"
 export function useValkeyConnectionNavigation() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { id: connectionId, clusterId } = useParams<{ id: string; clusterId?: string }>()
+  const { id } = useParams()
 
   const connection = useSelector((state: RootState) =>
-    connectionId ? state.valkeyConnection?.connections?.[connectionId] : null,
+    id ? state.valkeyConnection?.connections?.[id!] : null,
   )
 
   const previousStatus = useRef(connection?.status)
 
   useEffect(() => {
-    if (!connectionId || !connection) {
+    if (!id || !connection) {
       return
     }
 
@@ -37,10 +37,8 @@ export function useValkeyConnectionNavigation() {
           (currentStatus === ERROR && connection.reconnect && !isRetrying)
 
     if (shouldNavigate && !isOnReconnectPage) {
-      sessionStorage.setItem(`valkey-previous-${connectionId}`, location.pathname)
-      const reconnectPath = clusterId
-        ? `/${clusterId}/${connectionId}/valkey-reconnect`
-        : `/${connectionId}/valkey-reconnect`
+      sessionStorage.setItem(`valkey-previous-${id}`, location.pathname)
+      const reconnectPath = `/${id}/valkey-reconnect`
       navigate(reconnectPath, { replace: true })
     }
 
@@ -50,7 +48,6 @@ export function useValkeyConnectionNavigation() {
     connection?.reconnect?.isRetrying,
     location.pathname,
     navigate,
-    connectionId,
-    clusterId,
+    id,
   ])
 }
