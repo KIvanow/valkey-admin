@@ -9,7 +9,7 @@ import {
   switchMap,
   retry
 } from "rxjs/operators"
-import { CONNECTED, VALKEY, WS_RETRY_CONFIG, retryDelay } from "@common/src/constants.ts"
+import { CONNECTED, VALKEY, RETRY_CONFIG, retryDelay } from "@common/src/constants.ts"
 import { action$ } from "../middleware/rxjsMiddleware/rxjsMiddlware"
 import type { PayloadAction, Store } from "@reduxjs/toolkit"
 import { connectionBroken } from "@/state/valkey-features/connection/connectionSlice"
@@ -68,7 +68,7 @@ const connect = (store: Store) =>
           return socket.pipe(ignoreElements())
         }),
         retry({
-          count: WS_RETRY_CONFIG.MAX_RETRIES,
+          count: RETRY_CONFIG.MAX_RETRIES,
           delay: (error, retryCount) => {
             console.error(`WebSocket error (attempt ${retryCount}):`, error)
 
@@ -76,7 +76,7 @@ const connect = (store: Store) =>
 
             store.dispatch(reconnectAttempt({
               attempt: retryCount,
-              maxRetries: WS_RETRY_CONFIG.MAX_RETRIES,
+              maxRetries: RETRY_CONFIG.MAX_RETRIES,
               nextRetryDelay: delay,
             }))
 

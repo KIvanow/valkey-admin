@@ -11,7 +11,7 @@ import Settings from "./components/Settings.tsx"
 import LearnMore from "./components/LearnMore.tsx"
 import { KeyBrowser } from "./components/KeyBrowser.tsx"
 import { Cluster } from "./components/Cluster.tsx"
-import { Reconnect } from "./components/Reconnect.tsx"
+import { WebSocketReconnect } from "./components/WebSocketReconnect.tsx"
 import { ValkeyReconnect } from "./components/ValkeyReconnect.tsx"
 import { SendCommand } from "@/components/send-command/SendCommand.tsx"
 import { Connection } from "@/components/connection/Connection.tsx"
@@ -34,7 +34,7 @@ const AppWithHistory = () => {
       <Route element={<App />}>
         <Route element={<Navigate replace to="/connect" />} path="/" />
         <Route element={<Connection />} path="/connect" />
-        <Route element={<Reconnect />} path="/reconnect" />
+        <Route element={<WebSocketReconnect />} path="/reconnect" />
         <Route element={<Settings />} path="/settings" />
         <Route element={<LearnMore />} path="/learnmore" />
 

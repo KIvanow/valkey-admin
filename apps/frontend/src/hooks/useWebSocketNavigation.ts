@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router"
 import { CONNECTED, CONNECTING, ERROR } from "@common/src/constants"
 import type { RootState } from "@/store"
 
+// TO DO: replace in the EPIC
 export function useWebSocketNavigation() {
   const navigate = useNavigate()
   const location = useLocation()

@@ -6,7 +6,7 @@ import { Loader2, WifiOff, AlertCircle, ServerOff } from "lucide-react"
 import type { RootState } from "@/store"
 import { connectPending } from "@/state/wsconnection/wsConnectionSlice"
 
-export function Reconnect() {
+export function WebSocketReconnect() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const wsConnection = useSelector((state: RootState) => state.websocket)

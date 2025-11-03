@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useParams } from "react-router"
 import { CONNECTING, ERROR } from "@common/src/constants"
 import type { RootState } from "@/store"
 
+// TO DO: replace in the EPIC
 export function useValkeyConnectionNavigation() {
   const navigate = useNavigate()
   const location = useLocation()
