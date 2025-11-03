@@ -63,7 +63,7 @@ wss.on("connection", (ws: WebSocket) => {
     if (action.type === VALKEY.CLUSTER.setClusterData) {
       const client = clients.get(connectionId)
       if (client instanceof GlideClusterClient) {
-        await setClusterDashboardData(action.payload.clusterId, client, ws)
+        await setClusterDashboardData(action.payload.clusterId, client, ws, connectionId)
       }
 
     }

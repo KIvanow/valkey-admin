@@ -1,10 +1,11 @@
-import { merge } from "rxjs"
-import { ignoreElements, tap, delay } from "rxjs/operators"
+import { merge, timer, EMPTY } from "rxjs"
+import { ignoreElements, tap, delay, switchMap, catchError } from "rxjs/operators"
 import * as R from "ramda"
-import { DISCONNECTED, LOCAL_STORAGE, NOT_CONNECTED } from "@common/src/constants.ts"
+import { DISCONNECTED, LOCAL_STORAGE, NOT_CONNECTED, VALKEY_RETRY_CONFIG, valkeyRetryDelay } from "@common/src/constants.ts"
 import { toast } from "sonner"
 import { getSocket } from "./wsEpics"
-import { connectFulfilled, connectPending, deleteConnection, connectRejected } from "../valkey-features/connection/connectionSlice"
+import { connectFulfilled, connectPending, deleteConnection, connectRejected, startRetry, stopRetry }
+  from "../valkey-features/connection/connectionSlice"
 import { sendRequested } from "../valkey-features/command/commandSlice"
 import { setData } from "../valkey-features/info/infoSlice"
 import { action$, select } from "../middleware/rxjsMiddleware/rxjsMiddlware"
@@ -51,11 +52,68 @@ export const connectionEpic = (store: Store) =>
 
     action$.pipe(
       select(connectRejected),
-      tap(({ payload: { err, connectionId } }) => {
-        console.error("Connection rejected for", connectionId, ":", err)
-        toast.error(`Failed to connect: ${err?.message || "Unknown error"}`)
+      tap(({ payload: { connectionId, errorMessage } }) => {
+        console.error("Connection rejected for", connectionId, ":", errorMessage)
       }),
+      ignoreElements(),
     ),
+  )
+
+// Valkey connection retry epic
+export const valkeyRetryEpic = (store: Store) =>
+  action$.pipe(
+    select(connectRejected),
+    switchMap(({ payload: { connectionId } }) => {
+      const state = store.getState()
+      const connection = state.valkeyConnection?.connections?.[connectionId]
+
+      if (!connection) {
+        console.log(`No connection found for ${connectionId}, skipping retry`)
+        return EMPTY
+      }
+
+      const currentAttempt = (connection.reconnect?.currentAttempt || 0) + 1
+
+      // to see if we should retry
+      if (currentAttempt > VALKEY_RETRY_CONFIG.MAX_RETRIES) {
+        console.log(`Max retries reached for ${connectionId}`)
+        store.dispatch(stopRetry({ connectionId }))
+        toast.error("Unable to reconnect to Valkey instance")
+        return EMPTY
+      }
+
+      const nextDelay = valkeyRetryDelay(currentAttempt - 1)
+
+      store.dispatch(startRetry({
+        connectionId,
+        attempt: currentAttempt,
+        maxRetries: VALKEY_RETRY_CONFIG.MAX_RETRIES,
+        nextRetryDelay: nextDelay,
+      }))
+
+      console.log(`Retrying connection ${connectionId} (attempt ${currentAttempt}/${VALKEY_RETRY_CONFIG.MAX_RETRIES}) in ${nextDelay}ms`)
+
+      return timer(nextDelay).pipe(
+        tap(() => {
+          const { host, port, username, password } = connection.connectionDetails
+          console.log(`Attempting retry ${currentAttempt} for ${connectionId}`)
+
+          store.dispatch(connectPending({
+            connectionId,
+            host,
+            port,
+            username,
+            password,
+            isRetry: true,
+          }))
+        }),
+        catchError((err) => {
+          console.error(`Error during retry for ${connectionId}:`, err)
+          return EMPTY
+        }),
+        ignoreElements(),
+      )
+    }),
   )
 
 // reconnect epic

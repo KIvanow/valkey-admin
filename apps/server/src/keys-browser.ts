@@ -136,6 +136,8 @@ export async function getKeys(
       }),
     )
   } catch (err) {
+    console.error(`Valkey connection error for ${payload.connectionId}:`, err)
+
     ws.send(
       JSON.stringify({
         type: VALKEY.KEYS.getKeysFailed,
@@ -145,7 +147,17 @@ export async function getKeys(
         },
       }),
     )
-    console.log("Error getting keys from Valkey", err)
+
+    // valkey connection issue
+    ws.send(
+      JSON.stringify({
+        type: VALKEY.CONNECTION.connectRejected,
+        payload: {
+          connectionId: payload.connectionId,
+          errorMessage: "Error getting keys - Valkey instance could be down",
+        },
+      }),
+    )
   }
 }
 
@@ -171,6 +183,8 @@ export async function getKeyInfoSingle(
       }),
     )
   } catch (err) {
+    console.error(`Valkey connection error for ${payload.connectionId}:`, err)
+
     ws.send(
       JSON.stringify({
         type: VALKEY.KEYS.getKeyTypeFailed,
@@ -181,7 +195,17 @@ export async function getKeyInfoSingle(
         },
       }),
     )
-    console.log("Error getting key info from Valkey", err)
+
+    // valkey connection issue
+    ws.send(
+      JSON.stringify({
+        type: VALKEY.CONNECTION.connectRejected,
+        payload: {
+          connectionId: payload.connectionId,
+          errorMessage: "Error getting key info - Valkey instance could be down",
+        },
+      }),
+    )
   }
 }
 
@@ -208,6 +232,8 @@ export async function deleteKey(
       }),
     )
   } catch (err) {
+    console.error(`Valkey connection error for ${payload.connectionId}:`, err)
+
     ws.send(
       JSON.stringify({
         type: VALKEY.KEYS.deleteKeyFailed,
@@ -218,7 +244,17 @@ export async function deleteKey(
         },
       }),
     )
-    console.log("Error deleting key from Valkey", err)
+
+    // valkey connection issue
+    ws.send(
+      JSON.stringify({
+        type: VALKEY.CONNECTION.connectRejected,
+        payload: {
+          connectionId: payload.connectionId,
+          errorMessage: "Error in deleting key - Valkey instance could be down",
+        },
+      }),
+    )
   }
 }
 
@@ -345,6 +381,8 @@ export async function addKey(
       }),
     )
   } catch (err) {
+    console.error(`Valkey connection error for ${payload.connectionId}:`, err)
+
     ws.send(
       JSON.stringify({
         type: VALKEY.KEYS.addKeyFailed,
@@ -354,7 +392,17 @@ export async function addKey(
         },
       }),
     )
-    console.log("Error adding key to Valkey", err)
+
+    // valkey connection issue
+    ws.send(
+      JSON.stringify({
+        type: VALKEY.CONNECTION.connectRejected,
+        payload: {
+          connectionId: payload.connectionId,
+          errorMessage: "Error in adding key - Valkey instance could be down",
+        },
+      }),
+    )
   }
 }
 
@@ -527,6 +575,8 @@ export async function updateKey(
       }),
     )
   } catch (err) {
+    console.error(`Valkey connection error for ${payload.connectionId}:`, err)
+
     ws.send(
       JSON.stringify({
         type: VALKEY.KEYS.updateKeyFailed,
@@ -536,6 +586,16 @@ export async function updateKey(
         },
       }),
     )
-    console.log("Error updating key in Valkey", err)
+
+    // valkey connection issue
+    ws.send(
+      JSON.stringify({
+        type: VALKEY.CONNECTION.connectRejected,
+        payload: {
+          connectionId: payload.connectionId,
+          errorMessage: "Error in updating key - Valkey instance could be down",
+        },
+      }),
+    )
   }
 }

@@ -8,47 +8,74 @@ export async function setDashboardData(
   client: GlideClient,
   ws: WebSocket,
 ) {
-  const rawInfo = await client.info()
-  const info = parseInfo(rawInfo)
-  const rawMemoryStats = (await client.customCommand(["MEMORY", "STATS"], {
-    decoder: Decoder.String,
-  })) as Array<{
-    key: string;
-    value: string;
-  }>
+  try {
+    const rawInfo = await client.info()
+    const info = parseInfo(rawInfo)
+    const rawMemoryStats = (await client.customCommand(["MEMORY", "STATS"], {
+      decoder: Decoder.String,
+    })) as Array<{
+      key: string;
+      value: string;
+    }>
 
-  const memoryStats = rawMemoryStats.reduce((acc, { key, value }) => {
-    acc[key] = value
-    return acc
-  }, {} as Record<string, string>)
+    const memoryStats = rawMemoryStats.reduce((acc, { key, value }) => {
+      acc[key] = value
+      return acc
+    }, {} as Record<string, string>)
 
-  ws.send(
-    JSON.stringify({
-      type: VALKEY.STATS.setData,
-      payload: {
-        connectionId,
-        info: info,
-        memory: memoryStats,
-      },
-    }),
-  )
+    ws.send(
+      JSON.stringify({
+        type: VALKEY.STATS.setData,
+        payload: {
+          connectionId,
+          info: info,
+          memory: memoryStats,
+        },
+      }),
+    )
+  } catch (err) {
+    console.error(`Valkey connection error for ${connectionId}:`, err)
+    ws.send(
+      JSON.stringify({
+        type: VALKEY.CONNECTION.connectRejected,
+        payload: {
+          connectionId,
+          errorMessage: "Failed to fetch dashboard data - Valkey instance could be down",
+        },
+      }),
+    )
+  }
 }
 
 export async function setClusterDashboardData(
   clusterId: string,
   client: GlideClusterClient,
   ws: WebSocket,
+  connectionId: string,
 ) {
-  const rawInfo = await client.info({ route:"allNodes" })
-  const info = parseClusterInfo(rawInfo)
-  
-  ws.send(
-    JSON.stringify({
-      type: VALKEY.CLUSTER.setClusterData,
-      payload: {
-        clusterId,
-        info: info,
-      },
-    }),
-  )
+  try {
+    const rawInfo = await client.info({ route:"allNodes" })
+    const info = parseClusterInfo(rawInfo)
+
+    ws.send(
+      JSON.stringify({
+        type: VALKEY.CLUSTER.setClusterData,
+        payload: {
+          clusterId,
+          info: info,
+        },
+      }),
+    )
+  } catch (err) {
+    console.error(`Valkey cluster connection error for ${connectionId}:`, err)
+    ws.send(
+      JSON.stringify({
+        type: VALKEY.CONNECTION.connectRejected,
+        payload: {
+          connectionId,
+          errorMessage: "Failed to fetch cluster data - Valkey cluster could be down",
+        },
+      }),
+    )
+  }
 }

@@ -14,11 +14,19 @@ interface ConnectionDetails {
   clusterId?: string;
 }
 
+interface ReconnectState {
+  isRetrying: boolean;
+  currentAttempt: number;
+  maxRetries: number;
+  nextRetryDelay?: number;
+}
+
 export interface ConnectionState {
   status: ConnectionStatus;
   errorMessage: string | null;
   connectionDetails: ConnectionDetails;
   clusterNodes?: Record<string, ConnectionDetails>;
+  reconnect?: ReconnectState;
 }
 
 interface ValkeyConnectionsState {
@@ -44,13 +52,20 @@ const connectionSlice = createSlice({
         port: string;
         username?: string;
         password?: string;
+        isRetry?: boolean;
       }>,
     ) => {
-      const { connectionId, host, port, username = "", password = "" } = action.payload
+      const { connectionId, host, port, username = "", password = "", isRetry = false } = action.payload
+      const existingConnection = state.connections[connectionId]
+
       state.connections[connectionId] = {
         status: CONNECTING,
         errorMessage: null,
         connectionDetails: { host, port, username, password },
+        ...(existingConnection?.clusterNodes && { clusterNodes: existingConnection.clusterNodes }),
+        ...(isRetry && existingConnection?.reconnect && {
+          reconnect: existingConnection.reconnect,
+        }),
       }
     },
     connectFulfilled: (state, action) => {
@@ -61,12 +76,33 @@ const connectionSlice = createSlice({
         connectionState.errorMessage = null
         connectionState.clusterNodes = clusterNodes
         connectionState.connectionDetails.clusterId = clusterId
+        // Clear retry state on successful connection
+        delete connectionState.reconnect
       }
     },
     connectRejected: (state, action) => {
+      const { connectionId, errorMessage } = action.payload
+      if (state.connections[connectionId]) {
+        state.connections[connectionId].status = ERROR
+        state.connections[connectionId].errorMessage = errorMessage || "Valkey error"
+      }
+    },
+    startRetry: (state, action) => {
+      const { connectionId, attempt, maxRetries, nextRetryDelay } = action.payload
+      if (state.connections[connectionId]) {
+        state.connections[connectionId].reconnect = {
+          isRetrying: true,
+          currentAttempt: attempt,
+          maxRetries,
+          nextRetryDelay,
+        }
+      }
+    },
+    stopRetry: (state, action) => {
       const { connectionId } = action.payload
-      state.connections[connectionId].status = ERROR
-      state.connections[connectionId].errorMessage = action.payload || "Unknown error"
+      if (state.connections[connectionId]?.reconnect) {
+        state.connections[connectionId].reconnect!.isRetrying = false
+      }
     },
     connectionBroken: (state, action) => {
       const { connectionId } = action.payload
@@ -96,12 +132,14 @@ const connectionSlice = createSlice({
 })
 
 export default connectionSlice.reducer
-export const { 
-  connectPending, 
-  connectFulfilled, 
-  connectRejected, 
+export const {
+  connectPending,
+  connectFulfilled,
+  connectRejected,
   connectionBroken,
-  closeConnection, 
-  updateConnectionDetails, 
-  deleteConnection, 
+  closeConnection,
+  updateConnectionDetails,
+  deleteConnection,
+  startRetry,
+  stopRetry,
 } = connectionSlice.actions

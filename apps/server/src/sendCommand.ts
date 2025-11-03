@@ -37,6 +37,9 @@ export async function sendValkeyRunCommand(
       }),
     )
   } catch (err) {
+    console.error(`Valkey connection error for ${payload.connectionId}:`, err)
+
+    // Send command failure
     ws.send(
       JSON.stringify({
         meta: {
@@ -47,6 +50,16 @@ export async function sendValkeyRunCommand(
         payload: err,
       }),
     )
-    console.log("Error sending command to Valkey", err)
+
+    // valkey connection issue
+    ws.send(
+      JSON.stringify({
+        type: VALKEY.CONNECTION.connectRejected,
+        payload: {
+          connectionId: payload.connectionId,
+          errorMessage: "Failed to execute command - Valkey instance could be down",
+        },
+      }),
+    )
   }
 }

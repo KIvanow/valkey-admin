@@ -6,12 +6,14 @@ import { AppSidebar } from "./components/ui/app-sidebar"
 import { Toaster } from "./components/ui/sonner"
 import { DarkModeProvider } from "./contexts/DarkModeContext"
 import { useWebSocketNavigation } from "./hooks/useWebSocketNavigation"
+import { useValkeyConnectionNavigation } from "./hooks/useValkeyConnectionNavigation"
 import { connectPending } from "@/state/wsconnection/wsConnectionSlice"
 
 function App() {
   const dispatch = useDispatch()
 
   useWebSocketNavigation()
+  useValkeyConnectionNavigation()
 
   useEffect(() => {
     dispatch(connectPending())

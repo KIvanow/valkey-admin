@@ -12,6 +12,7 @@ import LearnMore from "./components/LearnMore.tsx"
 import { KeyBrowser } from "./components/KeyBrowser.tsx"
 import { Cluster } from "./components/Cluster.tsx"
 import { Reconnect } from "./components/Reconnect.tsx"
+import { ValkeyReconnect } from "./components/ValkeyReconnect.tsx"
 import { SendCommand } from "@/components/send-command/SendCommand.tsx"
 import { Connection } from "@/components/connection/Connection.tsx"
 import "./css/index.css"
@@ -39,6 +40,7 @@ const AppWithHistory = () => {
 
         {/* Routes with clusterId */}
         <Route element={<RequireConnection />}>
+          <Route element={<ValkeyReconnect />} path="/:clusterId/:id/valkey-reconnect" />
           <Route element={<Dashboard />} path="/:clusterId/:id/dashboard" />
           <Route element={<SendCommand />} path="/:clusterId/:id/sendcommand" />
           <Route element={<KeyBrowser />} path="/:clusterId/:id/browse" />
@@ -47,6 +49,7 @@ const AppWithHistory = () => {
 
         {/* Routes without clusterId */}
         <Route element={<RequireConnection />}>
+          <Route element={<ValkeyReconnect />} path="/:id/valkey-reconnect" />
           <Route element={<Dashboard />} path="/:id/dashboard" />
           <Route element={<SendCommand />} path="/:id/sendcommand" />
           <Route element={<KeyBrowser />} path="/:id/browse" />
