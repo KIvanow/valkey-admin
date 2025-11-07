@@ -27,7 +27,7 @@ interface ParsedNodeInfo {
 
 interface ClusterState {
   [clusterId: string]: {
-    nodes: Record<string, MasterNode>;
+    clusterNodes: Record<string, MasterNode>;
     data: {
       [nodeAddress: string]: ParsedNodeInfo;
     };
@@ -42,19 +42,19 @@ const clusterSlice = createSlice({
   },
   reducers: {
     addCluster: (state, action) => {
-      const { clusterId, nodes } = action.payload
+      const { clusterId, clusterNodes } = action.payload
       if (!state.clusters[clusterId]) {
         state.clusters[clusterId] = {
-          nodes: {},
+          clusterNodes: {},
           data: {},
         }
       }
-      state.clusters[clusterId].nodes = nodes 
+      state.clusters[clusterId].clusterNodes = clusterNodes 
     },
     updateClusterInfo: (state, action) => {
-      const { clusterId, nodes } = action.payload
+      const { clusterId, clusterNodes } = action.payload
       if (state.clusters[clusterId]) {
-        state.clusters[clusterId].nodes = nodes
+        state.clusters[clusterId].clusterNodes = clusterNodes
       }
     },
     removeCluster: (state, action) => {

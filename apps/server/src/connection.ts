@@ -78,16 +78,31 @@ async function discoverCluster(client: GlideClient) {
     const clusterNodes = response.reduce((acc, slotRange) => {
       const [, , ...nodes] = slotRange
 
-      return nodes.reduce((nodesById, [host, port], idx) => {
-        const id = `${host}-${port}`
-        return nodesById[id]
-          ? nodesById
-          :  { ...nodesById, [id]: { host, port, role: idx === 0 ? "primary" : "replica" } }
-      }, acc)
+      // transform CLUSTER from flat response into a nested structure (primaryNode → replicas[])
+      const [primaryHost, primaryPort] = nodes[0]
+      const primaryKey = `${primaryHost}:${primaryPort}`
+
+      if (!acc[primaryKey]) {
+        acc[primaryKey] = {
+          host: primaryHost,
+          port: primaryPort,
+          replicas: [],
+        }
+      }
+      // add replicas under their primary
+      nodes.slice(1).forEach(([host, port, id]) => {
+        const replica = { id, host, port }
+        // avoid duplicates
+        if (!acc[primaryKey].replicas.some((r) => r.id === id)) {
+          acc[primaryKey].replicas.push(replica)
+        }
+      })
+
+      return acc
     }, {} as Record<string, {
       host: string;
       port: number;
-      role: "primary" | "replica";
+      replicas: { id: string; host: string; port: number }[];
     }>)
 
     return { clusterNodes, clusterId }

@@ -1,66 +1,45 @@
 import { useSelector } from "react-redux"
 import { Server } from "lucide-react"
 import { useParams } from "react-router"
-import { Card } from "./ui/card"
 import { AppHeader } from "./ui/app-header"
-import { selectClusterData } from "@/state/valkey-features/cluster/clusterSelectors"
+import ClusterNode from "./ui/cluster-node"
+import { selectCluster } from "@/state/valkey-features/cluster/clusterSelectors"
 
 export function Cluster() {
   const { clusterId } = useParams()
-  const clusterData = useSelector(selectClusterData(clusterId!))
+  const clusterData = useSelector(selectCluster(clusterId!))
 
-  const formatRole = (role: string | null) => {
-    if (!role) return "UNKNOWN"
-    const normalized = role.toLowerCase()
-    if (normalized === "master") return "PRIMARY"
-    if (normalized === "slave") return "REPLICA"
-    return role.toUpperCase()
+  if (!clusterData.clusterNodes || !clusterData.data) {
+    return (
+      <div className="p-4 h-full flex flex-col">
+        <AppHeader icon={<Server size={20} />} title="Cluster Topology" />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-tw-dark-border text-center">
+            No cluster data available
+          </div>
+        </div>
+      </div>
+    )
   }
+
+  const clusterEntries = Object.entries(clusterData.clusterNodes)
 
   return (
     <div className="p-4">
       <AppHeader icon={<Server size={20} />} title="Cluster Topology" />
 
       <div className="flex flex-wrap gap-4 mt-4">
-        {Object.entries(clusterData).map(([nodeAddress, nodeInfo]) => (
-          <Card className="flex flex-col p-4 w-[280px]" key={nodeAddress}>
-            <div className="text-xl font-semibold mb-1 truncate">
-              {formatRole(nodeInfo.role)} 
-            </div>
-            <div className="text-sm text-muted-foreground mb-2">
-              {nodeInfo.server_name ?? "Unnamed Node"}@ {nodeAddress}
-            </div>
-
-            <div className="text-sm space-y-1">
-              <div>
-                <span className="font-medium">Uptime:</span>{" "}
-                {nodeInfo.uptime_in_days ?? "N/A"} days
-              </div>
-              <div>
-                <span className="font-medium">Port:</span>{" "}
-                {nodeInfo.tcp_port ?? "N/A"}
-              </div>
-              <div>
-                <span className="font-medium">Memory:</span>{" "}
-                {nodeInfo.used_memory_human ?? "N/A"}
-              </div>
-              <div>
-                <span className="font-medium">CPU (sys):</span>{" "}
-                {nodeInfo.used_cpu_sys ?? "N/A"}
-              </div>
-              <div>
-                <span className="font-medium">Ops/sec:</span>{" "}
-                {nodeInfo.instantaneous_ops_per_sec ?? "N/A"}
-              </div>
-              <div>
-                <span className="font-medium">Commands:</span>{" "}
-                {nodeInfo.total_commands_processed ?? "N/A"}
-              </div>
-            </div>
-          </Card>
+        {clusterEntries.map(([primaryKey, primary]) => (
+          <ClusterNode
+            allNodeData={clusterData.data}
+            clusterId={clusterId!}
+            key={primaryKey}
+            primary={primary}
+            primaryData={clusterData.data[primaryKey]}
+            primaryKey={primaryKey}
+          />
         ))}
       </div>
     </div>
   )
-
 }
