@@ -31,7 +31,7 @@ async function main() {
   const app = express()
 
   // public API goes here:
-  app.get("/health", (req, res) => res.json({ ok: true }))
+  app.get("/health", (_req, res) => res.json({ ok: true }))
 
   app.get('/memory', async (_req, res) => {
     try {

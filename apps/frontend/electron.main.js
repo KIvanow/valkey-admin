@@ -22,9 +22,15 @@ function startServer() {
 
 function startMetrics() {
     if (app.isPackaged) {
-        const serverPath = path.join(process.resourcesPath, 'server-metrics.js');
-        console.log(`Starting metrics server from: ${serverPath}`);
-        metricsProcess = fork(serverPath);
+        const metricsServerPath = path.join(process.resourcesPath, 'server-metrics.js');
+        console.log(`Starting metrics server from: ${metricsServerPath}`);
+        metricsProcess = fork(metricsServerPath, [], {
+            env: {
+                ...process.env,
+                VALKEY_URL: 'valkey://localhost:6379',
+                DATA_DIR: path.join(app.getPath('userData'), 'metrics-data')
+            }
+        });
 
         metricsProcess.on('close', (code) => {
             console.log(`Metrics server exited with code ${code}`);

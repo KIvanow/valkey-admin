@@ -30,9 +30,13 @@ export async function connectToValkey(
     clients.set(payload.connectionId, standaloneClient)
     ws.send(
       JSON.stringify({
-        type: VALKEY.CONNECTION.connectFulfilled,
+        type: VALKEY.CONNECTION.standaloneConnectFulfilled,
         payload: {
           connectionId: payload.connectionId,
+          connectionDetails: {
+            host: payload.host,
+            port: payload.port,
+          },
         },
       }),
     )
@@ -143,7 +147,7 @@ async function connectToCluster(
 
   ws.send(
     JSON.stringify({
-      type: VALKEY.CONNECTION.connectFulfilled,
+      type: VALKEY.CONNECTION.clusterConnectFulfilled,
       payload: {
         connectionId: payload.connectionId,
         clusterNodes,
