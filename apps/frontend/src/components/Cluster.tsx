@@ -9,9 +9,7 @@ export function Cluster() {
   const { clusterId } = useParams()
   const clusterData = useSelector(selectCluster(clusterId!))
 
-  console.log("clusterData::", clusterData)
-
-  if (!clusterData || !clusterData.clusterNodes || !clusterData.data) {
+  if (!clusterData.clusterNodes || !clusterData.data) {
     return (
       <div className="p-4 h-full flex flex-col">
         <AppHeader icon={<Server size={20} />} title="Cluster Topology" />
@@ -24,24 +22,23 @@ export function Cluster() {
     )
   }
 
+  const clusterEntries = Object.entries(clusterData.clusterNodes)
+
   return (
     <div className="p-4">
       <AppHeader icon={<Server size={20} />} title="Cluster Topology" />
 
       <div className="flex flex-wrap gap-4 mt-4">
-        {Object.entries(clusterData.clusterNodes).map(([primaryKey, primary]) => {
-          const primaryData = clusterData.data[primaryKey]
-          return (
-            <ClusterNode
-              allNodeData={clusterData.data}
-              clusterId = {clusterId!}
-              key={primaryKey}
-              primary={primary}
-              primaryData={primaryData}
-              primaryKey={primaryKey}
-            />
-          )
-        })}
+        {clusterEntries.map(([primaryKey, primary]) => (
+          <ClusterNode
+            allNodeData={clusterData.data}
+            clusterId={clusterId!}
+            key={primaryKey}
+            primary={primary}
+            primaryData={clusterData.data[primaryKey]}
+            primaryKey={primaryKey}
+          />
+        ))}
       </div>
     </div>
   )
