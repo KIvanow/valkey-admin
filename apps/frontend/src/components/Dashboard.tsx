@@ -15,13 +15,19 @@ export function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("")
 
   const accordionDescriptions = {
-    memoryUsageMetrics: "Detailed metrics for tracking Valkey's memory usage across data, scripts, functions, and peak consumption.",
-    uptimeMetrics: "Tracks server uptime and script eviction to monitor overall system activity and availability.",
-    replicationPersistenceMetrics: "Metrics that track database snapshots, data changes, and replication backlog health to ensure reliable syncing and persistence.",
-    clientConnectivityMetrics: "Metrics tracking client connections, activity, and connection limits to monitor workload and health.",
-    commandExecutionMetrics: "Metrics showing command volume, failures, slow operations, and errors to evaluate performance and stability.",
-    dataEffectivenessEvictionMetrics: "Tracks key activity, expirations, evictions, and cache hit-rates to assess data efficiency and access performance.",
-    messagingMetrics: "Tracks Pub/Sub channels, patterns, and clients to measure real-time activity."
+    memoryUsageMetrics:
+      "Detailed metrics for tracking Valkey's memory usage across data, scripts, functions, and peak consumption.",
+    uptimeMetrics:
+      "Tracks server uptime and script eviction to monitor overall system activity and availability.",
+    replicationPersistenceMetrics:
+      "Metrics that track database snapshots, data changes, and replication backlog health to ensure reliable syncing and persistence.",
+    clientConnectivityMetrics:
+      "Metrics tracking client connections, activity, and connection limits to monitor workload and health.",
+    commandExecutionMetrics:
+      "Metrics showing command volume, failures, slow operations, and errors to evaluate performance and stability.",
+    dataEffectivenessEvictionMetrics:
+      "Tracks key activity, expirations, evictions, and cache hit-rates to assess data efficiency and access performance.",
+    messagingMetrics: "Tracks Pub/Sub channels, patterns, and clients to measure real-time activity.",
   }
 
   const memoryUsageMetrics = {
@@ -125,45 +131,45 @@ export function Dashboard() {
             />
           </div>
           <Accordion
+            accordionDescription={accordionDescriptions.memoryUsageMetrics}
             accordionItems={memoryUsageMetrics}
             accordionName="Memory Usage Metrics"
-            accordionDescription={accordionDescriptions.memoryUsageMetrics}
             searchQuery={searchQuery}
             valueType="bytes" />
           <Accordion
+            accordionDescription={accordionDescriptions.uptimeMetrics}
             accordionItems={upTimeMetrics}
             accordionName="Uptime Metrics"
-            accordionDescription={accordionDescriptions.uptimeMetrics}
             searchQuery={searchQuery}
             valueType="mixed" />
           <Accordion
+            accordionDescription={accordionDescriptions.replicationPersistenceMetrics}
             accordionItems={replicationPersistenceMetrics}
             accordionName="Replication & Persistence Metrics"
-            accordionDescription={accordionDescriptions.replicationPersistenceMetrics}
             searchQuery={searchQuery}
             valueType="number" />
           <Accordion
+            accordionDescription={accordionDescriptions.clientConnectivityMetrics}
             accordionItems={clientConnectivityMetrics}
             accordionName="Client Connectivity Metrics"
-            accordionDescription={accordionDescriptions.clientConnectivityMetrics}
             searchQuery={searchQuery}
             valueType="number" />
           <Accordion
+            accordionDescription={accordionDescriptions.commandExecutionMetrics}
             accordionItems={commandExecutionMetrics}
             accordionName="Command Execution Metrics"
-            accordionDescription={accordionDescriptions.commandExecutionMetrics}
             searchQuery={searchQuery}
             valueType="number" />
           <Accordion
+            accordionDescription={accordionDescriptions.dataEffectivenessEvictionMetrics}
             accordionItems={dataEffectivenessAndEvictionMetrics}
             accordionName="Data Effectiveness & Eviction Metrics"
-            accordionDescription={accordionDescriptions.dataEffectivenessEvictionMetrics}
             searchQuery={searchQuery}
             valueType="number" />
           <Accordion
+            accordionDescription={accordionDescriptions.messagingMetrics}
             accordionItems={messagingMetrics}
             accordionName="Messaging Metrics"
-            accordionDescription={accordionDescriptions.messagingMetrics}
             searchQuery={searchQuery}
             valueType="number" />
         </div>

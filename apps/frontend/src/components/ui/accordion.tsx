@@ -12,7 +12,8 @@ interface AccordionProps {
   accordionDescription?: string;
 }
 
-export default function Accordion({ accordionName, accordionItems, valueType = "number", searchQuery = "", accordionDescription = "" }: AccordionProps) {
+export default function Accordion({ accordionName, accordionItems, valueType = "number", searchQuery = "",
+  accordionDescription = "" }: AccordionProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const ToggleIcon = isOpen ? CircleChevronUp : CircleChevronDown
@@ -62,8 +63,8 @@ export default function Accordion({ accordionName, accordionItems, valueType = "
         <div className="h-14 px-2 py-4 dark:border-tw-dark-border border rounded flex items-center gap-2 justify-between">
           <div className="flex flex-col gap-1">
             <span className="font-semibold text-sm flex items-center gap-1">{accordionName}
-              <CustomTooltip description={accordionDescription}> 
-                <CircleQuestionMark size={16} className="bg-tw-primary/10 rounded-full text-tw-primary" />
+              <CustomTooltip description={accordionDescription}>
+                <CircleQuestionMark className="bg-tw-primary/10 rounded-full text-tw-primary" size={16} />
               </CustomTooltip>
             </span>
             <span className="text-xs font-light text-tw-dark-border">
