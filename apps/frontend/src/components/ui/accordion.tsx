@@ -1,15 +1,18 @@
 import { useState, useMemo, useEffect } from "react"
-import { CircleChevronDown, CircleChevronUp, Dot } from "lucide-react"
+import { CircleChevronDown, CircleChevronUp, Dot, CircleQuestionMark } from "lucide-react"
 import { formatMetricValue, type ValueType } from "@common/src/format-metric-value"
+import { TooltipProvider } from "@radix-ui/react-tooltip"
+import { CustomTooltip } from "./custom-tooltip"
 
 interface AccordionProps {
   accordionName?: string;
   accordionItems?: Record<string, number | null>;
   valueType?: ValueType;
   searchQuery?: string;
+  accordionDescription?: string;
 }
 
-export default function Accordion({ accordionName, accordionItems, valueType = "number", searchQuery = "" }: AccordionProps) {
+export default function Accordion({ accordionName, accordionItems, valueType = "number", searchQuery = "", accordionDescription = "" }: AccordionProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const ToggleIcon = isOpen ? CircleChevronUp : CircleChevronDown
@@ -55,18 +58,24 @@ export default function Accordion({ accordionName, accordionItems, valueType = "
 
   return (
     <div className="w-full mt-2">
-      <div className="h-14 px-2 py-4 dark:border-tw-dark-border border rounded flex items-center gap-2 justify-between">
-        <div className="flex flex-col gap-1">
-          <span className="font-semibold text-sm">{accordionName}</span>
-          <span className="text-xs font-light text-tw-dark-border">
-            {searchQuery.trim() && filteredItemCount !== itemCount ? (
-              <>{filteredItemCount} of {itemCount} {itemCount === 1 ? "metric" : "metrics"}</>
-            ) : (
-              <>{itemCount} {itemCount === 1 ? "metric" : "metrics"}</>
-            )}</span>
+      <TooltipProvider>
+        <div className="h-14 px-2 py-4 dark:border-tw-dark-border border rounded flex items-center gap-2 justify-between">
+          <div className="flex flex-col gap-1">
+            <span className="font-semibold text-sm flex items-center gap-1">{accordionName}
+              <CustomTooltip description={accordionDescription}> 
+                <CircleQuestionMark size={16} className="bg-tw-primary/10 rounded-full text-tw-primary" />
+              </CustomTooltip>
+            </span>
+            <span className="text-xs font-light text-tw-dark-border">
+              {searchQuery.trim() && filteredItemCount !== itemCount ? (
+                <>{filteredItemCount} of {itemCount} {itemCount === 1 ? "metric" : "metrics"}</>
+              ) : (
+                <>{itemCount} {itemCount === 1 ? "metric" : "metrics"}</>
+              )}</span>
+          </div>
+          <button onClick={() => setIsOpen(!isOpen)}><ToggleIcon className="text-tw-primary cursor-pointer hover:text-tw-primary/80" /></button>
         </div>
-        <button onClick={() => setIsOpen(!isOpen)}><ToggleIcon className="text-tw-primary cursor-pointer hover:text-tw-primary/80" /></button>
-      </div>
+      </TooltipProvider>
 
       {isOpen && (
         <div className="px-2 py-3 border bg-gray-50 dark:bg-gray-800 text-sm dark:border-tw-dark-border rounded-b">

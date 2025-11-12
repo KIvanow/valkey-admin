@@ -14,6 +14,16 @@ export function Dashboard() {
   const infoData = useSelector(selectData(id!))
   const [searchQuery, setSearchQuery] = useState("")
 
+  const accordionDescriptions = {
+    memoryUsageMetrics: "Detailed metrics for tracking Valkey's memory usage across data, scripts, functions, and peak consumption.",
+    uptimeMetrics: "Tracks server uptime and script eviction to monitor overall system activity and availability.",
+    replicationPersistenceMetrics: "Metrics that track database snapshots, data changes, and replication backlog health to ensure reliable syncing and persistence.",
+    clientConnectivityMetrics: "Metrics tracking client connections, activity, and connection limits to monitor workload and health.",
+    commandExecutionMetrics: "Metrics showing command volume, failures, slow operations, and errors to evaluate performance and stability.",
+    dataEffectivenessEvictionMetrics: "Tracks key activity, expirations, evictions, and cache hit-rates to assess data efficiency and access performance.",
+    messagingMetrics: "Tracks Pub/Sub channels, patterns, and clients to measure real-time activity."
+  }
+
   const memoryUsageMetrics = {
     used_memory: infoData.used_memory,
     used_memory_dataset: infoData.used_memory_dataset,
@@ -117,36 +127,43 @@ export function Dashboard() {
           <Accordion
             accordionItems={memoryUsageMetrics}
             accordionName="Memory Usage Metrics"
+            accordionDescription={accordionDescriptions.memoryUsageMetrics}
             searchQuery={searchQuery}
             valueType="bytes" />
           <Accordion
             accordionItems={upTimeMetrics}
             accordionName="Uptime Metrics"
+            accordionDescription={accordionDescriptions.uptimeMetrics}
             searchQuery={searchQuery}
             valueType="mixed" />
           <Accordion
             accordionItems={replicationPersistenceMetrics}
             accordionName="Replication & Persistence Metrics"
+            accordionDescription={accordionDescriptions.replicationPersistenceMetrics}
             searchQuery={searchQuery}
             valueType="number" />
           <Accordion
             accordionItems={clientConnectivityMetrics}
             accordionName="Client Connectivity Metrics"
+            accordionDescription={accordionDescriptions.clientConnectivityMetrics}
             searchQuery={searchQuery}
             valueType="number" />
           <Accordion
             accordionItems={commandExecutionMetrics}
             accordionName="Command Execution Metrics"
+            accordionDescription={accordionDescriptions.commandExecutionMetrics}
             searchQuery={searchQuery}
             valueType="number" />
           <Accordion
             accordionItems={dataEffectivenessAndEvictionMetrics}
             accordionName="Data Effectiveness & Eviction Metrics"
+            accordionDescription={accordionDescriptions.dataEffectivenessEvictionMetrics}
             searchQuery={searchQuery}
             valueType="number" />
           <Accordion
             accordionItems={messagingMetrics}
             accordionName="Messaging Metrics"
+            accordionDescription={accordionDescriptions.messagingMetrics}
             searchQuery={searchQuery}
             valueType="number" />
         </div>
