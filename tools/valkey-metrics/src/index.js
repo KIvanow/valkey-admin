@@ -2,7 +2,7 @@ import fs from "fs"
 import express from "express"
 import { createClient } from "@valkey/client"
 import { loadConfig } from "./config.js"
-import * as Reader from "./effects/ndjson-reader.js"
+import * as Streamer from "./effects/ndjson-streamer.js"
 import { setupCollectors } from "./init-collectors.js"
 
 const cfg = loadConfig()
@@ -32,7 +32,7 @@ app.get("/health", (req, res) => res.json({ ok: true }))
 
 app.get('/memory', async (_req, res) => {
   try {
-    const rows = await Reader.memory_stats()
+    const rows = await Streamer.memory_stats()
     res.json({ rows })
   } catch (e) {
     res.status(500).json({ error: e.message })
@@ -41,7 +41,7 @@ app.get('/memory', async (_req, res) => {
 
 app.get('/cpu', async (_req, res) => {
   try {
-    const rows = await Reader.info_cpu()
+    const rows = await Streamer.info_cpu()
     res.json({ rows })
   } catch (e) {
     res.status(500).json({ error: e.message })
@@ -51,7 +51,7 @@ app.get('/cpu', async (_req, res) => {
 app.get('/slowlog', async (req, res) => {
   try {
     const count = Number(req.query.count) || 50
-    const rows = await Reader.slowlog_get(count)
+    const rows = await Streamer.slowlog_get(count)
     res.json({ count: Math.max(1, Math.min(500, count)), rows })
   } catch (e) {
     res.status(500).json({ error: e.message })
@@ -60,7 +60,7 @@ app.get('/slowlog', async (req, res) => {
 
 app.get('/slowlog_len', async (_req, res) => {
   try {
-    const rows = await Reader.slowlog_len()
+    const rows = await Streamer.slowlog_len()
     res.json({ rows })
   } catch (e) {
     res.status(500).json({ error: e.message })
@@ -69,7 +69,7 @@ app.get('/slowlog_len', async (_req, res) => {
 
 app.get('/monitor', async (_req, res) => {
   try {
-    const rows = await Reader.monitor();
+    const rows = await Streamer.monitor();
     res.json({ rows });
   } catch (e) {
     res.status(500).json({ error: e.message });

@@ -2,12 +2,7 @@ import fs from "fs"
 import path from "path"
 import * as R from "ramda"
 
-export const dayStr = (ts, prefix) => {
-  const iso = new Date(ts).toISOString()
-  return prefix === "monitor"
-    ? iso.replace(/-/g, "")
-    : iso.slice(0, 10).replace(/-/g, "")
-}
+const dayStr = ts => new Date(ts).toISOString().slice(0, 10).replace(/-/g, "")
 
 export const makeNdjsonWriter = ({ dataDir, filePrefix }) => {
   const fileFor = ts => path.join(dataDir, `${filePrefix}_${dayStr(ts, filePrefix)}.ndjson`)
