@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
-import { CONNECTED } from "@common/src/constants.ts"
 import { ChevronDown, ChevronRight, Network, CircleChevronRight } from "lucide-react"
+import { CONNECTED } from "@common/src/constants.ts"
 import { ConnectionEntry } from "./ConnectionEntry.tsx"
 import type { ConnectionState } from "@/state/valkey-features/connection/connectionSlice"
 import history from "@/history.ts"
