@@ -110,8 +110,8 @@ export default function DonutChart() {
               <Cell fill={chartColors[entry.name]} key={index} />
             ))}
           </Pie>
-          <Label fill="#666" position="center">
-            Total Keys : {totalKeys}
+          <Label fill="#666" position="center"
+            value={`Total Keys : ${totalKeys}`}>
           </Label>
           <Tooltip content={<CustomTooltip />} />
           <Legend
