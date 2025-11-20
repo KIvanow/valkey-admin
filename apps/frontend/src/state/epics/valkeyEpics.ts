@@ -47,7 +47,7 @@ export const connectionEpic = (store: Store) =>
               connectionDetails: p.connectionDetails,
               status: NOT_CONNECTED,
             }),
-            (connectionToSave) => R.assoc(payload.connectionId, connectionToSave, currentConnections),
+            (connectionToSave) => ({ ...currentConnections, [payload.connectionId]: connectionToSave }),
             JSON.stringify,
             (updated) => localStorage.setItem(LOCAL_STORAGE.VALKEY_CONNECTIONS, updated),
           )(payload)
@@ -196,9 +196,9 @@ export const sendRequestEpic = () =>
 export const setDataEpic = () =>
   action$.pipe(
     filter(
-      (action) =>
-        action.type === standaloneConnectFulfilled.type ||
-          action.type === clusterConnectFulfilled.type,
+      ({ type }) =>
+        type === standaloneConnectFulfilled.type ||
+          type === clusterConnectFulfilled.type,
     ),
     tap((action) => {
       const socket = getSocket()
