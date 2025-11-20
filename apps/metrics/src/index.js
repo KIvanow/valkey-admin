@@ -5,10 +5,10 @@ import { loadConfig } from "./config.js"
 import * as Streamer from "./effects/ndjson-streamer.js"
 import { setupCollectors, startMonitor, stopMonitor } from "./init-collectors.js"
 import { calculateHotKeys } from "./analyzers/calculateHotKeys.js"
+import { MODE, ACTION, MONITOR } from "./utils/constants.js"
 
 async function main() {
   const cfg = loadConfig()
-  const MONITOR = "monitor"
 
   const ensureDir = dir => { if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }) }
   ensureDir(cfg.server.data_dir)
@@ -72,31 +72,33 @@ async function main() {
 
   const monitorConfig = cfg.epics.find(e => e.name === MONITOR)
   const monitorDuration = monitorConfig.monitoringDuration
-  const monitorInterval = monitorConfig.monitoringInterval
   let monitorRunning = false
   let checkAt
 
   const monitorHandler = async action => {
     try {
       switch (action) {
-        case 'start':
+        case ACTION.START:
           if (monitorRunning) {
-            return { status: 'Monitor already running.', }
+            return { monitorRunning }
           }
           await startMonitor()
           monitorRunning = true
-          return { status: 'Monitor started.', checkAt: Date.now() + monitorDuration }
+          checkAt = Date.now() + monitorDuration
+          return { monitorRunning, checkAt}
 
-        case 'stop':
+        case ACTION.STOP:
           if (!monitorRunning) {
-            return { status: 'Monitor is already stopped.' }
+            checkAt = null
+            return { monitorRunning, checkAt }
           }
           await stopMonitor()
           monitorRunning = false
-          return { status: 'Monitor stopped.' }
+          checkAt = null
+          return { monitorRunning, checkAt }
 
-        case 'status':
-          return { running: monitorRunning }
+        case ACTION.STATUS:
+          return { monitorRunning }
 
         default:
           return { error: 'Invalid action. Use ?action=start|stop|status' }
@@ -108,23 +110,25 @@ async function main() {
   }
   app.get('/monitor', async (req, res) => {
     const result = await monitorHandler(req.query.action)
-    if (result.checkAt) checkAt = result.checkAt;
+    checkAt = result.checkAt
     return res.json(result)
   })
 
-  app.get('/hot-keys', async (_req, res) => {
+  app.get('/hot-keys', async (req, res) => {
+    let monitorResponse = {}
     try {
       if (!monitorRunning) {
-        const result = await monitorHandler("start")
-        checkAt = result.checkAt
-        return res.json({ checkAt })
+        monitorResponse = await monitorHandler(ACTION.START)
+        return res.json(monitorResponse)
       }
-      const currentTime = Date.now()
-      const monitorCycle = monitorInterval + monitorDuration
-      if (currentTime > checkAt) {
+      if (Date.now() > checkAt) {
         const hotkeys = await calculateHotKeys()
-        checkAt = currentTime + monitorCycle
-        return res.json(hotkeys)
+        if (req.query.mode !== MODE.CONTINUOUS) {
+          await monitorHandler(ACTION.STOP) 
+        }
+        monitorResponse = await monitorHandler(ACTION.STATUS)
+        return res.json({ nodeId: url, hotkeys, ...monitorResponse })
+
       }
       return res.json({ checkAt })
     } catch (e) {
@@ -135,7 +139,7 @@ async function main() {
   // Setting port to 0 means Express will dynamically find a port
   const port = Number(cfg.server.port || 0)
   const server = app.listen(port, () => {
-    const assignedPort = server.address().port;
+    const assignedPort = server.address().port
     console.log(`listening on http://0.0.0.0:${assignedPort}`)
     process.send?.({ type: 'metrics-started', payload: { valkeyUrl: url, metricsHost: 'http://0.0.0.0', metricsPort: assignedPort } });
   })
@@ -154,5 +158,4 @@ async function main() {
   process.on("SIGINT", shutdown)
   process.on("SIGTERM", shutdown)
 }
-
 main()
