@@ -5,9 +5,8 @@ import { loadConfig } from "./config.js"
 import * as Streamer from "./effects/ndjson-streamer.js"
 import { setupCollectors, startMonitor, stopMonitor } from "./init-collectors.js"
 import { calculateHotKeys } from "./analyzers/calculateHotKeys.js"
-
+import { MODE, ACTION, MONITOR } from "./utils/constants.js"
 const cfg = loadConfig()
-const MONITOR = "monitor"
 
 const ensureDir = dir => { if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }) }
 ensureDir(cfg.server.data_dir)
@@ -77,7 +76,7 @@ let checkAt
 const monitorHandler = async action => {
   try {
     switch (action) {
-      case 'start':
+      case ACTION.START:
         if (monitorRunning) {
           return { status: 'Monitor already running.', }
         }
@@ -86,7 +85,7 @@ const monitorHandler = async action => {
         console.log(monitorDuration)
         return { status: 'Monitor started.', checkAt: Date.now() + monitorDuration}
 
-      case 'stop':
+      case ACTION.STOP:
         if (!monitorRunning) {
           return { status: 'Monitor is already stopped.', checkAt: null }
         }
@@ -94,7 +93,7 @@ const monitorHandler = async action => {
         monitorRunning = false
         return { status: 'Monitor stopped.', checkAt: null }
 
-      case 'status':
+      case ACTION.STATUS:
         return { running: monitorRunning }
 
       default:
@@ -113,20 +112,19 @@ app.get('/monitor', async (req, res) => {
 
 app.get('/hot-keys', async (req, res) => {
   let result = {}
-  console.log("Req is ", req)
   try {
     if(!monitorRunning) {
-      result = await monitorHandler("start")
+      result = await monitorHandler(ACTION.START)
       checkAt = result.checkAt
       return res.json(result)
     }
     if (Date.now() > checkAt) {
       const hotkeys = await calculateHotKeys()
       console.log
-      if(req.query.mode !== "continuous") {
-        result = await monitorHandler("stop") 
+      if(req.query.mode !== MODE.CONTINUOUS) {
+        result = await monitorHandler(ACTION.STOP) 
       }
-      return res.json({hotkeys, ...result})
+      return res.json({nodeId: url, hotkeys, ...result})
       
     }
     return res.json({checkAt})
