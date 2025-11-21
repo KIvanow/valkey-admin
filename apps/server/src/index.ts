@@ -13,6 +13,21 @@ import { setDashboardData, setClusterDashboardData } from "./setDashboardData.ts
 import { sendValkeyRunCommand } from "./sendCommand.ts"
 
 const wss = new WebSocketServer({ port: 8080 })
+const metricsServerURIs: Map<string, string> = new Map()
+
+process.on("message", (message) => {
+  if (message?.type === "metrics-started") {
+    const metricsServerURI = `${message.payload.metricsHost}:${message.payload.metricsPort}`
+    metricsServerURIs.set(message.payload.serverConnectionId, metricsServerURI)
+    console.log(`Metrics server for ${message.payload.serverConnectionId} saved with URI ${metricsServerURI}`)
+  }
+
+  if (message?.type === "metrics-closed"){
+    if (metricsServerURIs.delete(message.payload.serverConnectionId)) {
+      console.log(`Metrics server for ${message.payload.serverConnectionId} closed.`)
+    }
+  }
+})
 
 wss.on("listening", () => { // Add a listener for when the server starts listening
   console.log("Websocket server running on localhost:8080")
