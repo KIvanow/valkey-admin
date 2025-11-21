@@ -41,10 +41,10 @@ wss.on("connection", (ws: WebSocket) => {
 
     const handlers: Record<string, Handler> = {
       [VALKEY.CONNECTION.connectPending]: connectPending,
+      [VALKEY.CONNECTION.resetConnection]: resetConnection,
+      [VALKEY.CLUSTER.setClusterData]: setClusterData,
       [VALKEY.COMMAND.sendRequested]: sendRequested,
       [VALKEY.STATS.setData]: setData,
-      [VALKEY.CLUSTER.setClusterData]: setClusterData,
-      [VALKEY.CONNECTION.resetConnection]: resetConnection,
       [VALKEY.KEYS.getKeysRequested]: getKeysRequested,
       [VALKEY.KEYS.getKeyTypeRequested]: getKeyTypeRequested,
       [VALKEY.KEYS.deleteKeyRequested]: deleteKeyRequested,
