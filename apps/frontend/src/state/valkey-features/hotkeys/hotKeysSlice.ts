@@ -36,7 +36,7 @@ const hotKeysSlice = createSlice({
     },
     hotKeysFulfilled: (state, action) => {
       const { hotKeys, monitorRunning, checkAt, nodeId } = action.payload.parsedResponse
-      console.log("Hot keys are: ", hotKeys)
+      console.log("Parsed response in the frontend is: ", action.payload.parsedResponse)
       const connectionId = action.payload.connectionId
       state[connectionId] = {
         hotKeys,
