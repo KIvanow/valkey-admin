@@ -175,11 +175,11 @@ export const ConnectionEntry = ({
                   type="text"
                   value={editedAlias}
                 />
-                <Button onClick={handleSave} size="sm" title="Save" variant="ghost">
-                  <CheckIcon className="text-green-600 dark:text-green-400" size={16} />
+                <Button onClick={handleSave} size="sm" title="Save" variant="secondary">
+                  <CheckIcon className="text-tw-primary" size={16} />
                 </Button>
-                <Button onClick={handleCancel} size="sm" title="Cancel" variant="ghost">
-                  <XIcon className="text-red-600 dark:text-red-400" size={16} />
+                <Button onClick={handleCancel} size="sm" title="Cancel" variant="destructiveGhost">
+                  <XIcon className="" size={16} />
                 </Button>
               </div>
             ) : (
