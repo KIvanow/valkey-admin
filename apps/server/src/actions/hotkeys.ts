@@ -62,7 +62,6 @@ export const hotKeysRequested = withDeps<Deps, void>(
           }
         }, delay)
       }
-      //
       else {
         sendHotKeysFulfilled(ws, connectionId, initialParsedResponse)
       }
