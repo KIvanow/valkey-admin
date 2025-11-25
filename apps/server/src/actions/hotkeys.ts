@@ -10,17 +10,16 @@ type HotKeysResponse = {
 
 export const hotKeysRequested = withDeps<Deps, void>(
   async ({ ws, connectionId, metricsServerURIs }) => {
-    console.log("The metric server uris are: ", metricsServerURIs)
     const metricsServerURI = metricsServerURIs.get(connectionId)
     try {
-      let response = await fetch(`http://${metricsServerURI}/hot-keys`)
+      let response = await fetch(`${metricsServerURI}/hot-keys`)
       let parsedResponse: HotKeysResponse = await response.json() as HotKeysResponse
       console.log(parsedResponse)
       if (parsedResponse.checkAt) {
         const delay = Math.max(parsedResponse.checkAt - Date.now(), 0)
         setTimeout(async () => {
           try {
-            response = await fetch(`http://${metricsServerURI}/hot-keys`)
+            response = await fetch(`${metricsServerURI}/hot-keys`)
             parsedResponse = await response.json() as HotKeysResponse
             ws.send( 
               JSON.stringify({

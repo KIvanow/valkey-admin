@@ -18,7 +18,7 @@ export function Dashboard() {
   const infoData = useSelector(selectData(id!))
   const [searchQuery, setSearchQuery] = useState("")
   const dispatch = useAppDispatch()
-  const hotKeys = (id: string) => {
+  const getHotKeys = (id: string) => {
     dispatch(hotKeysRequested({ connectionId: id }))
   }
 
@@ -112,7 +112,7 @@ export function Dashboard() {
         <button
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           onClick={() => {
-            hotKeys(id!)
+            getHotKeys(id!)
           }}
         >
           Test HotKeys

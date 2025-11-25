@@ -1,5 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit"
 import { type JSONObject } from "@common/src/json-utils"
+import { VALKEY } from "@common/src/constants.ts"
+import * as R from "ramda"
+import type { RootState } from "@/store.ts"
+
+export const selectHotKeys = (id: string) => (state: RootState) =>
+  R.path([VALKEY.HOTKEYS.name, id, "hotKeys"], state)
 
 interface HotKeysState {
   [connectionId: string]: {
@@ -30,6 +36,7 @@ const hotKeysSlice = createSlice({
     },
     hotKeysFulfilled: (state, action) => {
       const { hotKeys, monitorRunning, checkAt, nodeId } = action.payload.parsedResponse
+      console.log("Hot keys are: ", hotKeys)
       const connectionId = action.payload.connectionId
       state[connectionId] = {
         hotKeys,
