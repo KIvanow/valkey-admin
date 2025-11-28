@@ -75,6 +75,9 @@ export const NOT_CONNECTED = "Not Connected"
 export const DISCONNECTED = "Disconnected"
 export const RECONNECTING = "Reconnecting"
 
+export const PENDING = "Pending"
+export const FULFILLED = "Fulfilled"
+
 export const LOCAL_STORAGE = {
   VALKEY_CONNECTIONS: "VALKEY_CONNECTIONS",
 }

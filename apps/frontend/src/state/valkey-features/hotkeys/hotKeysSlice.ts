@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit"
 import { type JSONObject } from "@common/src/json-utils"
-import { VALKEY } from "@common/src/constants.ts"
+import { ERROR, FULFILLED, PENDING, VALKEY } from "@common/src/constants.ts"
 import * as R from "ramda"
 import type { RootState } from "@/store.ts"
+
+type HotKeysStatus = typeof PENDING | typeof FULFILLED | typeof ERROR
 
 export const selectHotKeys = (id: string) => (state: RootState) =>
   R.path([VALKEY.HOTKEYS.name, id, "hotKeys"], state)
@@ -14,6 +16,7 @@ interface HotKeysState {
     monitorRunning: boolean,
     nodeId: string|null,
     error?: JSONObject | null,
+    status: HotKeysStatus,
   }
 }
 
@@ -31,6 +34,7 @@ const hotKeysSlice = createSlice({
           checkAt: null, 
           monitorRunning: false,
           nodeId: null,
+          status: PENDING,
         }
       }
     },
@@ -42,12 +46,14 @@ const hotKeysSlice = createSlice({
         checkAt,
         monitorRunning, 
         nodeId,
+        status: FULFILLED,
       }
       
     },
     hotKeysError: (state, action) => {
       const { connectionId, error } = action.payload
       state[connectionId].error = error
+      state[connectionId].status= ERROR
     },
   },
 })

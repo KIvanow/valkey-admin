@@ -154,7 +154,7 @@ async function connectToCluster(
     payload: {
       connectionId: payload.connectionId,
       clusterNodes,
-      clusterId: clusterId,
+      clusterId,
     },
   }
 
