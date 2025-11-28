@@ -20,6 +20,7 @@ import { action$, select } from "../middleware/rxjsMiddleware/rxjsMiddlware"
 import { setClusterData } from "../valkey-features/cluster/clusterSlice"
 import { connectFulfilled as wsConnectFulfilled } from "../wsconnection/wsConnectionSlice"
 import { hotKeysRequested } from "../valkey-features/hotkeys/hotKeysSlice.ts"
+import { slowLogsRequested } from "../valkey-features/slowlogs/slowLogsSlice.ts"
 import history from "../../history.ts"
 import type { Store } from "@reduxjs/toolkit"
 
@@ -251,11 +252,25 @@ export const setDataEpic = () =>
     }),
   )
 
-export const getHotKeysEpic = () => 
+export const getHotKeysEpic = () =>
   action$.pipe(
     select(hotKeysRequested),
     tap((action) => {
       const socket = getSocket()
       socket.next(action)
     }),
+  )
+
+export const getSlowLogsEpic = () =>
+  action$.pipe(
+    select(slowLogsRequested),
+    tap((action) => {
+      try {
+        const socket = getSocket()
+        socket.next(action)
+      } catch (error) {
+        console.error("[getSlowLogsEpic] Error sending action:", error)
+      }
+    }),
+    ignoreElements(),
   )

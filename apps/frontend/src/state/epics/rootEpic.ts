@@ -1,14 +1,15 @@
 import { merge } from "rxjs"
 import { wsConnectionEpic } from "./wsEpics"
-import { 
-  connectionEpic, 
-  sendRequestEpic, 
-  setDataEpic, 
-  deleteConnectionEpic, 
+import {
+  connectionEpic,
+  sendRequestEpic,
+  setDataEpic,
+  deleteConnectionEpic,
   updateConnectionDetailsEpic,
-  autoReconnectEpic, 
-  valkeyRetryEpic, 
-  getHotKeysEpic 
+  autoReconnectEpic,
+  valkeyRetryEpic,
+  getHotKeysEpic,
+  getSlowLogsEpic
 } from "./valkeyEpics"
 import { keyBrowserEpic } from "./keyBrowserEpic"
 import type { Store } from "@reduxjs/toolkit"
@@ -24,6 +25,7 @@ export const registerEpics = (store: Store) => {
     sendRequestEpic(),
     setDataEpic(),
     getHotKeysEpic(),
+    getSlowLogsEpic(),
     keyBrowserEpic(),
   ).subscribe({
     error: (err) => console.error("Epic error:", err),
