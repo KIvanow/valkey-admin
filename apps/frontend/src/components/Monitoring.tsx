@@ -8,7 +8,7 @@ import { SlowLogs } from "./ui/slow-logs"
 import type { RootState } from "@/store"
 import { slowLogsRequested, selectSlowLogs } from "@/state/valkey-features/slowlogs/slowLogsSlice"
 import { useAppDispatch } from "@/hooks/hooks"
-import { hotKeysRequested, selectHotKeys } from "@/state/valkey-features/hotkeys/hotKeysSlice"
+import { hotKeysRequested, selectHotKeys, selectHotKeysStatus } from "@/state/valkey-features/hotkeys/hotKeysSlice"
 
 type TabType = "hot-keys" | "large-keys" | "slow-logs"
 
@@ -19,6 +19,7 @@ export const Monitoring = () => {
 
   const slowLogsData = useSelector((state: RootState) => selectSlowLogs(id!)(state))
   const hotKeysData = useSelector((state: RootState) => selectHotKeys(id!)(state))
+  const hotKeysStatus = useSelector((state: RootState) => selectHotKeysStatus(id!)(state))
 
   useEffect(() => {
     if (id) {
@@ -81,7 +82,7 @@ export const Monitoring = () => {
       {/* Tab Content */}
       <div className="flex-1 border dark:border-tw-dark-border rounded overflow-y-auto">
         {activeTab === "hot-keys" && (
-          <HotKeys data={hotKeysData} />
+          <HotKeys data={hotKeysData} status={hotKeysStatus} />
         )}
         {activeTab === "large-keys" && (
           <div className="h-full flex items-center justify-center">

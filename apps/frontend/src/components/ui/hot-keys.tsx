@@ -1,25 +1,43 @@
 import React, { useState } from "react"
-import { ArrowUp, ArrowDown } from "lucide-react"
+import { ArrowUp, ArrowDown, Loader2 } from "lucide-react"
 import * as R from "ramda"
 
 type SortOrder = "asc" | "desc"
 
 interface HotKeysProps {
   data: [string, number][] | null
+  status?: string
 }
 
-export function HotKeys({ data }: HotKeysProps) {
+export function HotKeys({ data, status }: HotKeysProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
 
   const toggleSortOrder = () => {
     setSortOrder((prev) => prev === "asc" ? "desc" : "asc")
   }
 
-  const sortedHotKeys = [...R.defaultTo([], data)].sort((a, b) => {
-    const countA = a[1]
-    const countB = b[1]
-    return sortOrder === "asc" ? countA - countB : countB - countA
-  })
+  const sortedHotKeys = R.sort<[string, number]>(
+    (a, b) => {
+      const countA = a[1]
+      const countB = b[1]
+      return sortOrder === "asc" ? countA - countB : countB - countA
+    },
+    R.defaultTo([], data),
+  )
+
+  // loader while the hotkeys are getting fetched
+  if (status === "Pending") {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="animate-spin text-tw-primary" size={32} />
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            Loading hot keys...
+          </span>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="h-full w-full flex flex-col">
