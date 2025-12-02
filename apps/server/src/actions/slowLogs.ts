@@ -58,14 +58,13 @@ export const slowLogsRequested = withDeps<Deps, void>(
     const promises = connectionIds.map(async (connectionId: string) => {
       const metricsServerURI = metricsServerURIs.get(connectionId)
       try {
-        const count = 50 
-        const url = `${metricsServerURI}/slowlog?count=${count}`
+        const url = `${metricsServerURI}/slowlog`
         console.log("[slowLogsRequested] Fetching from:", url)
 
         const initialResponse = await fetch(url)
         const initialParsedResponse: SlowLogsResponse = await initialResponse.json() as SlowLogsResponse
         if (initialParsedResponse.checkAt) {
-          const delay = Math.max(initialParsedResponse.checkAt - Date.now(), 0)
+          const delay = initialParsedResponse.checkAt - Date.now()
           // Schedule the follow-up request for when the monitor cycle finishes
           setTimeout(async () => {
             try {

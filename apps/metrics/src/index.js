@@ -58,6 +58,7 @@ async function main() {
       if (lastUpdatedAt !== null) {
         const count = Number(req.query.count) || 50
         const rows = await Streamer.slowlog_get(count)
+        // Add minimum (1) and maximum (500) boundaries for rows requested
         return res.json({ count: Math.max(1, Math.min(500, count)), rows, lastUpdatedAt })
       }
       else return res.json({checkAt: nextCycleAt, lastUpdatedAt})
