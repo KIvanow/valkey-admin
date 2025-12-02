@@ -6,7 +6,6 @@ import { startCollector } from "./epics/collector-rx.js"
 /*
   State per collector with shape:
   {
-    name: string,
     isRunning: boolean,
     lastUpdatedAt: timestamp,
     nextCycleAt: timestamp, // Calculated only for collectors, not the monitor as the monitor is controlled manually
@@ -14,8 +13,8 @@ import { startCollector } from "./epics/collector-rx.js"
 */
 const collectorsState = {}
 
-export const updateCollectorMeta = (name, patch) => {
-  const prev = collectorsState[name] || { name }
+const updateCollectorMeta = (name, patch) => {
+  const prev = collectorsState[name] || {}
   const next = { ...prev, ...patch }
   collectorsState[name] = next
   return next
@@ -105,22 +104,24 @@ const setupCollectors = async (client, cfg) => {
 
       updateCollectorMeta(f.name, {
         isRunning: true,
-        startedAt: Date.now(),
         lastUpdatedAt: null,
         nextCycleAt: Date.now() + f.poll_ms,
+        startedAt: Date.now(),
       })
 
       const sink = {
         appendRows: async rows => {
           nd.appendRows(rows)
           updateCollectorMeta(f.name, {
+            nextCycleAt: Date.now() + f.poll_ms,
             lastUpdatedAt: Date.now(),
           })
         },
         close: () => {
           updateCollectorMeta(f.name, {
             isRunning: false,
-            stoppedAt: Date.now()
+            nextCycleAt: null,
+            stoppedAt: Date.now(),
           })
           nd.close
         }
