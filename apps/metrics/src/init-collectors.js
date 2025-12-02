@@ -104,22 +104,24 @@ const setupCollectors = async (client, cfg) => {
 
       updateCollectorMeta(f.name, {
         isRunning: true,
-        startedAt: Date.now(),
         lastUpdatedAt: null,
         nextCycleAt: Date.now() + f.poll_ms,
+        startedAt: Date.now(),
       })
 
       const sink = {
         appendRows: async rows => {
           nd.appendRows(rows)
           updateCollectorMeta(f.name, {
+            nextCycleAt: Date.now() + f.poll_ms,
             lastUpdatedAt: Date.now(),
           })
         },
         close: () => {
           updateCollectorMeta(f.name, {
             isRunning: false,
-            stoppedAt: Date.now()
+            nextCycleAt: null,
+            stoppedAt: Date.now(),
           })
           nd.close
         }
