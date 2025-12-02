@@ -2,7 +2,7 @@ import { WebSocket } from "ws"
 import { GlideClient, GlideClusterClient, Batch, ClusterBatch, RouteOption, SingleNodeRoute } from "@valkey/valkey-glide"
 import * as R from "ramda"
 import { VALKEY } from "../../../common/src/constants.ts"
-import { buildScanCommandArgs } from "./valkeyClientCommands.ts"
+import { buildScanCommandArgs } from "./valkey-client-commands.ts"
 
 interface EnrichedKeyInfo {
   name: string;
