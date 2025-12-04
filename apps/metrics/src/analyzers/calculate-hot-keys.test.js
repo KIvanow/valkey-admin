@@ -8,7 +8,7 @@ describe("calculateHotKeys", () => {
       { ts: 2, command: "set foo 123" },
       { ts: 3, command: "get bar" },
       { ts: 4, command: "HGET foo field" },
-      { ts: 5, command: "INCR counter" },   // ignored
+      { ts: 5, command: "INCR counter" }, // ignored
       { ts: 6, command: "  GET   foo   " }, // extra spaces handled
     ]
 
@@ -24,13 +24,13 @@ describe("calculateHotKeys", () => {
     const rows = [
       { ts: 1, command: "MGET foo bar baz" },
       { ts: 2, command: "json.mget user:1 user:2" },
-      { ts: 3, command: "GET foo" },                 // foo again → now 2 hits
-      { ts: 4, command: "PING" },                    // ignored
+      { ts: 3, command: "GET foo" }, // foo again, now with  2 hits
+      { ts: 4, command: "PING" }, // ignored
     ]
 
     const result = calculateHotKeys(rows)
 
-    // foo: 2 hits, bar/baz/user:1/user:2: 1 hit each → only foo survives cutoff > 1
+    // foo: 2 hits, bar/baz/user:1/user:2: 1 hit each, so only foo survives cutoff > 1
     expect(result).toEqual([
       ["foo", 2],
     ])

@@ -15,7 +15,7 @@ describe("startCollector", () => {
   // still running, then assert that fetch is not called on every tick—proving exhaustMap blocks overlapping executions.
   it("calls fetch on interval and never overlaps fetch calls", async () => {
     const fetch = vi.fn(() => {
-      // simulate slow fetch: resolves after 80ms
+      // simulate a fetch slower than the interval (80ms fetch vs 50ms interval)
       return new Promise(resolve => {
         setTimeout(() => resolve([{ id: "row" }]), 80)
       })
@@ -48,10 +48,8 @@ describe("startCollector", () => {
   it("batches rows and passes arrays to writer.appendRows", async () => {
     const fetch = vi
       .fn()
-      // first two polls: what we care about
-      .mockResolvedValueOnce([{ id: 1 }, { id: 2 }]) // first poll
-      .mockResolvedValueOnce([{ id: 3 }])            // second poll
-      // any further polls return an empty array (no more rows)
+      .mockResolvedValueOnce([{ id: 1 }, { id: 2 }])
+      .mockResolvedValueOnce([{ id: 3 }])
       .mockResolvedValue([])
 
     const writer = { appendRows: vi.fn(() => Promise.resolve()) }
@@ -85,10 +83,8 @@ describe("startCollector", () => {
   it("retries fetch on error and eventually writes rows", async () => {
     const fetch = vi
       .fn()
-      .mockRejectedValueOnce(new Error("temporary")) // first call fails
-      // second call succeeds with 1 row
+      .mockRejectedValueOnce(new Error("temporary"))
       .mockResolvedValueOnce([{ id: 1 }])
-      // subsequent calls return empty arrays (no extra rows)
       .mockResolvedValue([])
 
     const writer = { appendRows: vi.fn(() => Promise.resolve()) }
@@ -131,16 +127,14 @@ describe("startCollector", () => {
       batchMax: 100,
     })
 
-    // let it run a bit
-    await vi.advanceTimersByTimeAsync(200)
+    await vi.advanceTimersByTimeAsync(200) // let it run a bit
 
     const fetchCallsBeforeStop = fetch.mock.calls.length
     const writesBeforeStop = writer.appendRows.mock.calls.length
 
     stop()
 
-    // advance more time; nothing new should happen
-    await vi.advanceTimersByTimeAsync(500)
+    await vi.advanceTimersByTimeAsync(500) // advance more time; nothing new should happen
 
     expect(fetch.mock.calls.length).toBe(fetchCallsBeforeStop)
     expect(writer.appendRows.mock.calls.length).toBe(writesBeforeStop)
