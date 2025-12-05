@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { ArrowUp, ArrowDown } from "lucide-react"
+import { ArrowUp, ArrowDown, Clock } from "lucide-react"
 import * as R from "ramda"
 
 type SortOrder = "asc" | "desc"
@@ -40,70 +40,84 @@ export function SlowLogs({ data }: SlowLogsProps) {
 
   return (
     <div className="h-full w-full flex flex-col">
-      <div className="flex-1 rounded overflow-y-auto">
-        {sortedSlowLogs.length > 0 ? (
-          <div className="h-full w-full flex flex-col">
-            {/* Header */}
-            <div className="bg-white dark:bg-neutral-900 border-b dark:border-neutral-700 p-4">
-              <div className="flex items-center gap-4">
-                <button
-                  className="text-sm font-semibold text-gray-700 dark:text-neutral-300 w-45 flex items-center gap-2 hover:text-tw-primary"
-                  onClick={toggleSortOrder}
-                >
-                  Timestamp
-                  {sortOrder === "asc" ? (
-                    <ArrowUp size={16} />
-                  ) : (
-                    <ArrowDown size={16} />
-                  )}
-                </button>
-                <span className="text-sm font-semibold text-gray-700 dark:text-neutral-300 w-24">
-                  Duration
-                </span>
-                <span className="text-sm font-semibold text-gray-700 dark:text-neutral-300 flex-1">
-                  Command
-                </span>
-                <span className="text-sm font-semibold text-gray-700 dark:text-neutral-300 w-40">
-                  Client Address
-                </span>
+      {sortedSlowLogs.length > 0 ? (
+        <>
+          {/* Header */}
+          <div className="sticky top-0 z-10 border-b-2 dark:border-tw-dark-border">
+            <div className="flex items-center px-4 py-3">
+              <button
+                className="text-xs font-bold w-1/4 flex items-center gap-2 hover:text-tw-primary transition-colors"
+                onClick={toggleSortOrder}
+              >
+                <Clock className="text-tw-primary" size={16} />
+                Timestamp
+                {sortOrder === "asc" ? (
+                  <ArrowUp size={14} />
+                ) : (
+                  <ArrowDown size={14} />
+                )}
+              </button>
+              <div className="text-xs font-bold w-1/6 text-center">
+                Duration
+              </div>
+              <div className="text-xs font-bold flex-1">
+                Command
+              </div>
+              <div className="text-xs font-bold w-1/5 text-center">
+                Client Address
               </div>
             </div>
+          </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto">
-              <div className="px-4">
+          {/* Contents*/}
+          <div className="flex-1 overflow-y-auto">
+            <table className="w-full">
+              <tbody>
                 {sortedSlowLogs.map((entry, index) => (
-                  <div
-                    className="flex items-center gap-4 border-b dark:border-neutral-700 py-1 hover:bg-tw-primary/10"
+                  <tr
+                    className="group border-b dark:border-tw-dark-border hover:bg-tw-primary/10"
                     key={`${entry.groupTs}-${entry.id}-${index}`}
                   >
-                    <span className="text-sm text-gray-600 dark:text-neutral-400 w-45">
-                      {new Date(entry.ts).toLocaleString()}
-                    </span>
-                    <span className="text-sm text-gray-800 dark:text-neutral-200 w-24 font-mono">
-                      {entry.duration_us} µs
-                    </span>
-                    <div className="flex-1">
-                      <code className="text-sm text-tw-primary bg-tw-primary/20 px-2 py-1 rounded">
+                    {/* timestamp */}
+                    <td className="px-4 py-2 w-1/4">
+                      <span className="text-sm">
+                        {new Date(entry.ts).toLocaleString()}
+                      </span>
+                    </td>
+
+                    {/* duration */}
+                    <td className="px-4 py-2 w-1/6 text-center">
+                      <span className="inline-flex font-mono items-center text-sm bg-tw-primary/30 px-2 text-tw-primary rounded-full">
+                        {entry.duration_us} µs
+                      </span>
+                    </td>
+
+                    {/* command */}
+                    <td className="px-4 py-2 flex-1">
+                      <code className="text-sm font-mono text-tw-primary bg-tw-primary/20 px-3 py-1 rounded-full">
                         {entry.argv.join(" ")}
                       </code>
-                    </div>
-                    <span className="text-sm text-gray-600 dark:text-neutral-400 w-40 font-mono">
-                      {entry.addr}
-                    </span>
-                  </div>
+                    </td>
+
+                    {/* client address */}
+                    <td className="px-4 py-2 w-1/5 text-center">
+                      <span className="text-sm font-mono">
+                        {entry.addr}
+                      </span>
+                    </td>
+                  </tr>
                 ))}
-              </div>
-            </div>
+              </tbody>
+            </table>
           </div>
-        ) : (
-          <div className="h-full flex items-center justify-center">
-            <span className="text-lg text-gray-500 dark:text-white mb-2">
-              No Slow Logs Found
-            </span>
-          </div>
-        )}
-      </div>
+        </>
+      ) : (
+        <div className="h-full flex flex-col items-center justify-center">
+          <Clock className="mb-3 opacity-30" size={48} />
+          <span className="text-lg font-medium">No Slow Logs Found</span>
+          <span className="text-sm mt-1">Slow commands will appear here</span>
+        </div>
+      )}
     </div>
   )
 }
