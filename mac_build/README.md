@@ -15,3 +15,4 @@
 ## Steps
 1. Copy `.env.example` to `.env`.
 2. Add all required values.
+3. Build, sign and notarize application by running `npm run package:mac` from the root directory.
