@@ -12,7 +12,7 @@ const fileFor = (prefix, date) => {
   return path.join(dataDir, `${prefix}_${dayStr(date)}.ndjson`)
 }
 
-export async function streamNdjson(prefix, filterFn = () => true, limit = Infinity) {
+export async function streamNdjson(prefix,{ filterFn = () => true, limit = Infinity } = {}) {
   const today = new Date()
   const yesterday = new Date(today)
   yesterday.setDate(today.getDate() - 1)
@@ -52,4 +52,4 @@ export async function streamNdjson(prefix, filterFn = () => true, limit = Infini
 
 export const [memory_stats, info_cpu, slowlog_len, commandlog_slow, commandlog_large_reply, commandlog_large_request, monitor] =
   // eslint-disable-next-line max-len
-  ["memory", "cpu", "slowlog_len", COMMANDLOG_SLOW, COMMANDLOG_LARGE_REPLY, COMMANDLOG_LARGE_REQUEST, MONITOR].map((filePrefix) => () => streamNdjson(filePrefix))
+  ["memory", "cpu", "slowlog_len", COMMANDLOG_SLOW, COMMANDLOG_LARGE_REPLY, COMMANDLOG_LARGE_REQUEST, MONITOR].map((filePrefix) => (options = {}) => streamNdjson(filePrefix, options))
