@@ -9,6 +9,8 @@
     2. Master hostname will be `localhost`.
     3. Master nodes ports will be `7001` - `7003`.
 
+**Note:** If your computer's ip address changes the cluster will work in unexpected ways. To resolve this, you will need to delete the Docker containers and volumes of the cluster, then restart the cluster.
+
 ### Running the apps
 
 1. Install all dependencies from the project root: `npm ci`
