@@ -1,16 +1,25 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+const { notarize } = require("electron-notarize");
 
-const result = require("dotenv").config({ path: "./mac_build/.env", debug: true })
-const { notarize } = require("electron-notarize")
+function isEnvFilePresent() {
+  const result = require("dotenv").config({ path: "./mac_build/.env", debug: true });
+  if (result.error?.code === "ENOENT") {
+    console.log("  • ⚠️ No mac_build/.env detected. Skipping notarization step.");
+    return false;
+  }
 
-if (result.error) {
-  throw result.error
+  return true;
 }
 
+
 exports.default = async function notarizing(context) {
-  if (!result || process.env.SKIP_NOTARIZE === "true") {
-    console.log("  • No mac_build/.env or SKIP_NOTARIZE=true detected. Skipping notarization step.")
-    return
+  if (!isEnvFilePresent()) {
+    return;
+  }
+
+  if (process.env.SKIP_NOTARIZE === "true") {
+    console.log("  • ⚠️ SKIP_NOTARIZE=true detected. Skipping notarization step.");
+    return;
   }
 
   const { electronPlatformName, appOutDir } = context
