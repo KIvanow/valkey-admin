@@ -5,7 +5,7 @@ const pickLevel = () => {
   return levels[lvl] ?? levels.info
 }
 
-const asString = x => {
+const asString = (x) => {
   if (x instanceof Error) return x.stack || `${x.name}: ${x.message}`
   if (typeof x === "object") return JSON.stringify(x)
   return String(x)
@@ -17,7 +17,7 @@ const linePretty = (ts, name, level, args) =>
 const lineJSON = (ts, name, level, args) =>
   JSON.stringify({ ts, level, name, msg: args.map(asString).join(" ") })
 
-export const createLogger = name => {
+export const createLogger = (name) => {
   const min = pickLevel()
   const fmt = String(process.env.LOG_FORMAT || "pretty").toLowerCase()  // pretty | json
 
@@ -34,6 +34,6 @@ export const createLogger = name => {
     debug: (...a) => write("debug", ...a),
     info:  (...a) => write("info",  ...a),
     warn:  (...a) => write("warn",  ...a),
-    error: (...a) => write("error", ...a)
+    error: (...a) => write("error", ...a),
   }
 }

@@ -142,8 +142,8 @@ app.whenReady().then(() => {
         default:
           try {
             console.log(`Received unknown server message: ${JSON.stringify(message)}`)
-          } catch (_) {
-            console.log(`Received unknown server message: ${message}`)
+          } catch (e) {
+            console.log(`Received unknown server message: ${message}. Error: `, e)
           }
 
       }

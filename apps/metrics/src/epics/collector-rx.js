@@ -21,24 +21,24 @@ export const startCollector = ({ name, pollMs, fetch, writer, batchMs, batchMax 
     exhaustMap(() =>
       defer(() => fetch()).pipe(
         retry({ delay: backoffDelay() }),
-        catchError(err => {
+        catchError((err) => {
           log.error(`[${name}] fetch error`, err?.message || err)
           return EMPTY
-        })
-      )
+        }),
+      ),
     ),
-    mergeMap(rows => Array.isArray(rows) ? rows : []), // am I too defensive? it should be an array. right?
+    mergeMap((rows) => Array.isArray(rows) ? rows : []), // am I too defensive? it should be an array. right?
     bufferTime(batchMs, null, batchMax), // batch rows
     filter(R.isNotEmpty),
-    tap(batch => {
+    tap((batch) => {
       // tap is only for SYNC side effects, so don't write into files here! use concatMap below
       log.debug(`[${name}] write ${batch.length} rows`)
     }),
-    concatMap(batch => writer.appendRows(batch)) // sequential writes
+    concatMap((batch) => writer.appendRows(batch)), // sequential writes
   )
 
   const sub = pipeline$.subscribe({
-    error: e => log.error(`[${name}] stream error`, e)
+    error: (e) => log.error(`[${name}] stream error`, e),
   })
 
   return () => sub.unsubscribe()

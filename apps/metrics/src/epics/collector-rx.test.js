@@ -16,7 +16,7 @@ describe("startCollector", () => {
   it("calls fetch on interval and never overlaps fetch calls", async () => {
     const fetch = vi.fn(() => {
       // simulate a fetch slower than the interval (80ms fetch vs 50ms interval)
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => resolve([{ id: "row" }]), 80)
       })
     })

@@ -44,6 +44,7 @@ export function useValkeyConnectionNavigation() {
 
     previousStatus.current = currentStatus
   }, [
+    connection,
     connection?.status,
     connection?.reconnect?.isRetrying,
     location.pathname,

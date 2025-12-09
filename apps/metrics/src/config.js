@@ -16,7 +16,7 @@ const loadConfig = () => {
     server: { port: 3000, data_dir: "/app/data" },
     collector: { batch_ms: 60000, batch_max: 500 },
     epics: [],
-    ...parsed
+    ...parsed,
   }
 
   cfg.valkey = cfg.valkey && typeof cfg.valkey === "object" ? cfg.valkey : {}
