@@ -2,7 +2,10 @@ import React, { useState } from "react"
 import { ArrowUp, ArrowDown, Clock } from "lucide-react"
 import * as R from "ramda"
 
-type SortOrder = "asc" | "desc"
+const ASC = "asc" as const
+const DESC = "desc" as const
+
+type SortOrder = typeof ASC | typeof DESC
 type SortField = "timestamp" | "metric"
 
 interface SlowLogEntry {
@@ -65,15 +68,15 @@ const logTypeConfig = {
 
 export function CommandLogTable({ data, logType }: CommandLogTableProps) {
   const [sortField, setSortField] = useState<SortField>("timestamp")
-  const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
+  const [sortOrder, setSortOrder] = useState<SortOrder>(DESC)
   const config = logTypeConfig[logType]
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortOrder((prev) => prev === "asc" ? "desc" : "asc")
+      setSortOrder((prev) => prev === ASC ? DESC : ASC)
     } else {
       setSortField(field)
-      setSortOrder("desc")
+      setSortOrder(DESC)
     }
   }
 
@@ -84,7 +87,7 @@ export function CommandLogTable({ data, logType }: CommandLogTableProps) {
         groupTs: logGroup.ts,
       })),
     )
-    .sort((sortOrder === "asc" ? R.ascend : R.descend)(
+    .sort((sortOrder === ASC ? R.ascend : R.descend)(
       sortField === "timestamp"
         ? R.prop("ts")
         : R.prop(config.metricKey as keyof typeof R.prop),
@@ -105,7 +108,7 @@ export function CommandLogTable({ data, logType }: CommandLogTableProps) {
               >
                 <Clock className="text-tw-primary" size={16} />
                 Timestamp
-                {sortField === "timestamp" && sortOrder === "asc" ? (
+                {sortField === "timestamp" && sortOrder === ASC ? (
                   <ArrowUp size={14} />
                 ) : (
                   <ArrowDown size={14} />
@@ -118,7 +121,7 @@ export function CommandLogTable({ data, logType }: CommandLogTableProps) {
                 onClick={() => toggleSort("metric")}
               >
                 {config.metricLabel}
-                {sortField === "metric" && sortOrder === "asc" ? (
+                {sortField === "metric" && sortOrder === ASC ? (
                   <ArrowUp size={14} />
                 ) : (
                   <ArrowDown size={14} />
