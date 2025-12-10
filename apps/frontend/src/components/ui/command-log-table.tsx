@@ -87,7 +87,7 @@ export function CommandLogTable({ data, logType }: CommandLogTableProps) {
     .sort((sortOrder === "asc" ? R.ascend : R.descend)(
       sortField === "timestamp"
         ? R.prop("ts")
-        : R.prop(config.metricKey as keyof typeof R.prop)
+        : R.prop(config.metricKey as keyof typeof R.prop),
     ))
 
   return (
