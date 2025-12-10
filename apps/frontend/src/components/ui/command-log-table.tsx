@@ -1,11 +1,9 @@
 import React, { useState } from "react"
 import { ArrowUp, ArrowDown, Clock } from "lucide-react"
 import * as R from "ramda"
+import { SORT_ORDER } from "@common/src/constants"
 
-const ASC = "asc" as const
-const DESC = "desc" as const
-
-type SortOrder = typeof ASC | typeof DESC
+type SortOrder = typeof SORT_ORDER.ASC | typeof SORT_ORDER.DESC
 type SortField = "timestamp" | "metric"
 
 interface SlowLogEntry {
@@ -68,15 +66,15 @@ const logTypeConfig = {
 
 export function CommandLogTable({ data, logType }: CommandLogTableProps) {
   const [sortField, setSortField] = useState<SortField>("timestamp")
-  const [sortOrder, setSortOrder] = useState<SortOrder>(DESC)
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_ORDER.DESC)
   const config = logTypeConfig[logType]
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortOrder((prev) => prev === ASC ? DESC : ASC)
+      setSortOrder((prev) => prev === SORT_ORDER.ASC ? SORT_ORDER.DESC : SORT_ORDER.ASC)
     } else {
       setSortField(field)
-      setSortOrder(DESC)
+      setSortOrder(SORT_ORDER.DESC)
     }
   }
 
@@ -87,7 +85,7 @@ export function CommandLogTable({ data, logType }: CommandLogTableProps) {
         groupTs: logGroup.ts,
       })),
     )
-    .sort((sortOrder === ASC ? R.ascend : R.descend)(
+    .sort((sortOrder === SORT_ORDER.ASC ? R.ascend : R.descend)(
       sortField === "timestamp"
         ? R.prop("ts")
         : R.prop(config.metricKey as keyof typeof R.prop),
@@ -108,7 +106,7 @@ export function CommandLogTable({ data, logType }: CommandLogTableProps) {
               >
                 <Clock className="text-tw-primary" size={16} />
                 Timestamp
-                {sortField === "timestamp" && sortOrder === ASC ? (
+                {sortField === "timestamp" && sortOrder === SORT_ORDER.ASC ? (
                   <ArrowUp size={14} />
                 ) : (
                   <ArrowDown size={14} />
@@ -121,7 +119,7 @@ export function CommandLogTable({ data, logType }: CommandLogTableProps) {
                 onClick={() => toggleSort("metric")}
               >
                 {config.metricLabel}
-                {sortField === "metric" && sortOrder === ASC ? (
+                {sortField === "metric" && sortOrder === SORT_ORDER.ASC ? (
                   <ArrowUp size={14} />
                 ) : (
                   <ArrowDown size={14} />
