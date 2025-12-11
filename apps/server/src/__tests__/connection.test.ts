@@ -93,19 +93,21 @@ describe("connectToValkey", () => {
 
       assert.ok(mockWs.send.mock.calls.length >= 2)
 
-      const standaloneMessage = JSON.parse(messages[0])
+      const parsedMessages = messages.map((msg) => JSON.parse(msg))
+
+      const standaloneMessage = parsedMessages[0]
       assert.strictEqual(standaloneMessage.type, VALKEY.CONNECTION.standaloneConnectFulfilled)
 
-      const clusterMessage = JSON.parse(messages.find((msg: string) =>
-        JSON.parse(msg).type === VALKEY.CLUSTER.addCluster,
-      ) || "{}")
+      const clusterMessage = parsedMessages.find((msg) => msg.type === VALKEY.CLUSTER.addCluster)
+      assert.ok(clusterMessage)
       assert.ok(clusterMessage.payload)
       assert.ok(clusterMessage.payload.clusterNodes)
       assert.ok(clusterMessage.payload.clusterId)
 
-      const clusterConnectMessage = JSON.parse(messages.find((msg: string) =>
-        JSON.parse(msg).type === VALKEY.CONNECTION.clusterConnectFulfilled,
-      ) || "{}")
+      const clusterConnectMessage = parsedMessages.find((msg) =>
+        msg.type === VALKEY.CONNECTION.clusterConnectFulfilled,
+      )
+      assert.ok(clusterConnectMessage)
       assert.strictEqual(clusterConnectMessage.payload.connectionId, "conn-123")
     } finally {
       GlideClient.createClient = originalCreateClient

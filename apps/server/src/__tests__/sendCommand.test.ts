@@ -1,19 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, mock } from "node:test"
+import { describe, it, mock, beforeEach } from "node:test"
 import assert from "node:assert"
 import { ConnectionError, TimeoutError, ClosingError } from "@valkey/valkey-glide"
 import { sendValkeyRunCommand } from "../sendCommand.ts"
 import { VALKEY } from "../../../../common/src/constants.ts"
 
 describe("sendValkeyRunCommand", () => {
+  let mockWs: any
+  let messages: string[]
+
+  beforeEach(() => {
+    messages = []
+    mockWs = {
+      send: mock.fn((msg: string) => messages.push(msg)),
+    }
+  })
+
   it("should send command and return successful response", async () => {
     const mockClient = {
       customCommand: mock.fn(async () => "myvalue"),
-    }
-
-    const messages: string[] = []
-    const mockWs = {
-      send: mock.fn((msg: string) => messages.push(msg)),
     }
 
     const payload = {
@@ -39,11 +44,6 @@ describe("sendValkeyRunCommand", () => {
       customCommand: mock.fn(async () => "valkey_version:8.0.0\nvalkey_mode:standalone"),
     }
 
-    const messages: string[] = []
-    const mockWs = {
-      send: mock.fn((msg: string) => messages.push(msg)),
-    }
-
     const payload = {
       command: "INFO",
       connectionId: "conn-123",
@@ -64,11 +64,6 @@ describe("sendValkeyRunCommand", () => {
       customCommand: mock.fn(async () => "ResponseError: unknown command"),
     }
 
-    const messages: string[] = []
-    const mockWs = {
-      send: mock.fn((msg: string) => messages.push(msg)),
-    }
-
     const payload = {
       command: "INVALID COMMAND",
       connectionId: "conn-123",
@@ -84,11 +79,6 @@ describe("sendValkeyRunCommand", () => {
   it("should handle array responses", async () => {
     const mockClient = {
       customCommand: mock.fn(async () => ["key1", "key2", "key3"]),
-    }
-
-    const messages: string[] = []
-    const mockWs = {
-      send: mock.fn((msg: string) => messages.push(msg)),
     }
 
     const payload = {
@@ -109,11 +99,6 @@ describe("sendValkeyRunCommand", () => {
       customCommand: mock.fn(async () => {
         throw error
       }),
-    }
-
-    const messages: string[] = []
-    const mockWs = {
-      send: mock.fn((msg: string) => messages.push(msg)),
     }
 
     const payload = {
@@ -142,11 +127,6 @@ describe("sendValkeyRunCommand", () => {
       }),
     }
 
-    const messages: string[] = []
-    const mockWs = {
-      send: mock.fn((msg: string) => messages.push(msg)),
-    }
-
     const payload = {
       command: "GET mykey",
       connectionId: "conn-123",
@@ -165,11 +145,6 @@ describe("sendValkeyRunCommand", () => {
       customCommand: mock.fn(async () => {
         throw error
       }),
-    }
-
-    const messages: string[] = []
-    const mockWs = {
-      send: mock.fn((msg: string) => messages.push(msg)),
     }
 
     const payload = {
@@ -192,11 +167,6 @@ describe("sendValkeyRunCommand", () => {
       }),
     }
 
-    const messages: string[] = []
-    const mockWs = {
-      send: mock.fn((msg: string) => messages.push(msg)),
-    }
-
     const payload = {
       command: "GET mykey",
       connectionId: "conn-123",
@@ -212,11 +182,6 @@ describe("sendValkeyRunCommand", () => {
   it("should split command string into array correctly", async () => {
     const mockClient = {
       customCommand: mock.fn(async () => "OK"),
-    }
-
-    const messages: string[] = []
-    const mockWs = {
-      send: mock.fn((msg: string) => messages.push(msg)),
     }
 
     const payload = {
