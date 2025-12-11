@@ -120,3 +120,8 @@ export const SORT_ORDER = {
   ASC: "asc",
   DESC: "desc",
 } as const
+
+export const SORT_FIELD = {
+  TIMESTAMP: "timestamp",
+  METRIC: "metric",
+} as const

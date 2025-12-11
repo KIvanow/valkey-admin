@@ -55,6 +55,8 @@ export function KeyBrowser() {
     { value: "hash", label: "Hash" },
     { value: "list", label: "List" },
     { value: "set", label: "Set" },
+    { value: "zset", label: "Zset" },
+    { value: "stream", label: "Stream" },
   ]
 
   const handleSearch = (e: React.FormEvent) => {
