@@ -3,14 +3,14 @@ import { ACTION, MONITOR, MODE } from "../utils/constants.js"
 import { calculateHotKeysFromMonitor } from "../analyzers/calculate-hot-keys.js"
 import { startMonitor, stopMonitor } from "../init-collectors.js"
 import { enrichHotKeys } from "../analyzers/enrich-hot-keys.js"
-
+import * as Streamer from "../effects/ndjson-streamer.js"
 const readMonitorMetadata = () => getCollectorMeta(MONITOR)
 const toResponse = ({ isRunning, willCompleteAt }) => ({
   monitorRunning: isRunning,
   checkAt: willCompleteAt,
 })
 
-export const useMonitor = async (req, res) => {
+export const useMonitor = async (req, res, cfg, client) => {
   let monitorResponse = {}
   const { isRunning, willCompleteAt: checkAt } = getCollectorMeta(MONITOR) 
   try {

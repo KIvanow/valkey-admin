@@ -17,7 +17,7 @@ export const getHotSlots = async (client, limit = 50) => {
       .filter(Boolean)
   } catch (error) {
     console.error(
-      "Error retrieving hot slots: You may need `cluster-slot-slotStats-enabled yes`. ERROR:",
+      "ERROR:",
       error,
     )
     return []

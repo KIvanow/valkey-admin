@@ -6,8 +6,8 @@ import * as Streamer from "./effects/ndjson-streamer.js"
 import { setupCollectors } from "./init-collectors.js"
 import { getCommandLogs } from "./handlers/commandlog-handler.js"
 import { monitorHandler, useMonitor } from "./handlers/monitor-handler.js"
-import { belongsToCluster, isEvictionPolicyLFU } from "./handlers/lfu-hotkeys-handler.js"
 import { calculateHotKeysFromHotSlots } from "./analyzers/calculate-hot-keys.js"
+import { enrichHotKeys } from "./analyzers/enrich-hot-keys.js"
 
 async function main() {
   const cfg = loadConfig()
@@ -71,11 +71,11 @@ async function main() {
   })
 
   app.get("/hot-keys", async (req, res) => {
-    if (isEvictionPolicyLFU(client) && belongsToCluster(client)){
-      const hotKeys = await calculateHotKeysFromHotSlots(client, req.query.count)
-      return res.json(hotKeys)
+    if (req.query.useHotSlots === "true"){
+      const hotKeys = await calculateHotKeysFromHotSlots(client, req.query.count).then(enrichHotKeys(client))
+      return res.json({ hotKeys })
     } 
-    else useMonitor(req, res)
+    else useMonitor(req, res, cfg, client)
   })
 
   // Setting port to 0 means Express will dynamically find a port
