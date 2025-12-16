@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Check, Pencil, X } from "lucide-react"
+import { KEY_TYPES } from "@common/src/constants"
 import { CustomTooltip } from "./custom-tooltip"
 import { Button } from "./button"
 import { useAppDispatch } from "@/hooks/hooks"
@@ -57,7 +58,7 @@ export default function KeyDetailsJson(
       dispatch(updateKeyRequested({
         connectionId: connectionId,
         key: selectedKey,
-        keyType: "JSON",
+        keyType: KEY_TYPES.JSON,
         value: editedValue,
       }))
       setIsEditable(false)
