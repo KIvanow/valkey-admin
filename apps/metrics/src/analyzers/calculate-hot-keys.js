@@ -3,7 +3,22 @@ import { Heap } from "heap-js"
 import { getHotSlots } from "./get-hot-slots.js"
 
 export const calculateHotKeysFromMonitor = (rows) => {
-  const ACCESS_COMMANDS = ["get", "set", "mget", "hget", "hgetall", "hmget", "json.get", "json.mget"]
+  const ACCESS_COMMANDS = [
+    // String commands
+    "get", "mget", "getrange", "getex", "substr",
+    // Hash commands
+    "hget", "hgetall", "hmget", "hkeys", "hvals", "hscan",
+    // List commands
+    "lrange", "lindex", "llen", "lpos",
+    // Set commands
+    "smembers", "sismember", "scard", "sscan", "srandmember",
+    // ZSet (Sorted Set) commands
+    "zrange", "zrangebyscore", "zrevrange", "zcard", "zscore", "zscan", "zrank", "zrevrank",
+    // Stream commands
+    "xrange", "xrevrange", "xread", "xlen",
+    // JSON commands
+    "json.get", "json.mget",
+  ]
   const CUT_OFF_FREQUENCY = 1
 
   return R.pipe(

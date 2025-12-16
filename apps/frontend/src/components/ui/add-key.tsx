@@ -4,6 +4,7 @@ import { useParams } from "react-router"
 import { validators } from "@common/src/key-validators"
 import * as R from "ramda"
 import { HashFields, ListFields, StringFields, SetFields, ZSetFields, StreamFields, JsonFields } from "./key-types"
+import {KEY_TYPES} from "@common/src/constants"
 import { useAppDispatch } from "@/hooks/hooks"
 import { addKeyRequested } from "@/state/valkey-features/keys/keyBrowserSlice"
 
@@ -107,11 +108,11 @@ export default function AddNewKey({ onClose }: AddNewKeyProps) {
       keyType,
       value,
       ttl: parsedTtl,
-      hashFields: keyType === "Hash" ? hashFields : undefined,
-      listFields: keyType === "List" ? listFields : undefined,
-      setFields: keyType === "Set" ? setFields : undefined,
-      zsetFields: keyType === "ZSet" ? zsetFields : undefined,
-      streamFields: keyType === "Stream" ? streamFields : undefined,
+      hashFields: keyType === KEY_TYPES.HASH ? hashFields : undefined,
+      listFields: keyType === KEY_TYPES.LIST ? listFields : undefined,
+      setFields: keyType === KEY_TYPES.SET ? setFields : undefined,
+      zsetFields: keyType === KEY_TYPES.ZSET ? zsetFields : undefined,
+      streamFields: keyType === KEY_TYPES.STREAM ? streamFields : undefined,
     }
 
     const validator = validators[keyType as keyof typeof validators] || validators["undefined"]
@@ -132,90 +133,103 @@ export default function AddNewKey({ onClose }: AddNewKeyProps) {
         ttl: parsedTtl && parsedTtl > 0 ? parsedTtl : undefined,
       }
 
-      if (keyType === "String") {
-        dispatch(
-          addKeyRequested({
-            ...basePayload,
-            value: value.trim(),
-          }),
-        )
-      } else if (keyType === "Hash") {
-        // before dispatching, filtering out the empty fields
-        const validFields = hashFields
-          .filter((field) => field.field.trim() && field.value.trim())
-          .map((field) => ({
-            field: field.field.trim(),
-            value: field.value.trim(),
-          }))
+      switch (keyType) {
+        case KEY_TYPES.STRING:
+          dispatch(
+            addKeyRequested({
+              ...basePayload,
+              value: value.trim(),
+            }),
+          )
+          break
+        case KEY_TYPES.HASH: {
+          // before dispatching, filtering out the empty fields
+          const validFields = hashFields
+            .filter((field) => field.field.trim() && field.value.trim())
+            .map((field) => ({
+              field: field.field.trim(),
+              value: field.value.trim(),
+            }))
 
-        dispatch(
-          addKeyRequested({
-            ...basePayload,
-            fields: validFields,
-          }),
-        )
-      } else if (keyType === "List") {
-        // before dispatching, filtering out the empty fields
-        const validFields = listFields
-          .filter((field) => field.trim())
-          .map((field) => field.trim())
+          dispatch(
+            addKeyRequested({
+              ...basePayload,
+              fields: validFields,
+            }),
+          )
+          break
+        }
+        case KEY_TYPES.LIST: {
+          // before dispatching, filtering out the empty fields
+          const validFields = listFields
+            .filter((field) => field.trim())
+            .map((field) => field.trim())
 
-        dispatch(
-          addKeyRequested({
-            ...basePayload,
-            values: validFields,
-          }),
-        )
-      } else if (keyType === "Set") {
-        // before dispatching, filtering out the empty fields
-        const validFields = setFields
-          .filter((field) => field.trim())
-          .map((field) => field.trim())
+          dispatch(
+            addKeyRequested({
+              ...basePayload,
+              values: validFields,
+            }),
+          )
+          break
+        }
+        case KEY_TYPES.SET: {
+          // before dispatching, filtering out the empty fields
+          const validFields = setFields
+            .filter((field) => field.trim())
+            .map((field) => field.trim())
 
-        dispatch(
-          addKeyRequested({
-            ...basePayload,
-            values: validFields,
-          }),
-        )
-      } else if (keyType === "ZSet") {
-        // before dispatching, filtering out the empty fields and converting scores to numbers
-        const validMembers = zsetFields
-          .filter((field) => field.key.trim() && field.value.trim())
-          .map((field) => ({
-            key: field.key.trim(),
-            value: parseFloat(field.value),
-          }))
+          dispatch(
+            addKeyRequested({
+              ...basePayload,
+              values: validFields,
+            }),
+          )
+          break
+        }
+        case KEY_TYPES.ZSET: {
+          // before dispatching, filtering out the empty fields and converting scores to numbers
+          const validMembers = zsetFields
+            .filter((field) => field.key.trim() && field.value.trim())
+            .map((field) => ({
+              key: field.key.trim(),
+              value: parseFloat(field.value),
+            }))
 
-        dispatch(
-          addKeyRequested({
-            ...basePayload,
-            zsetMembers: validMembers,
-          }),
-        )
-      } else if (keyType === "Stream") {
-        // before dispatching, filtering out the empty fields
-        const validFields = streamFields
-          .filter((field) => field.field.trim() && field.value.trim())
-          .map((field) => ({
-            field: field.field.trim(),
-            value: field.value.trim(),
-          }))
+          dispatch(
+            addKeyRequested({
+              ...basePayload,
+              zsetMembers: validMembers,
+            }),
+          )
+          break
+        }
+        case KEY_TYPES.STREAM: {
+          // before dispatching, filtering out the empty fields
+          const validFields = streamFields
+            .filter((field) => field.field.trim() && field.value.trim())
+            .map((field) => ({
+              field: field.field.trim(),
+              value: field.value.trim(),
+            }))
 
-        dispatch(
-          addKeyRequested({
-            ...basePayload,
-            fields: validFields,
-            streamEntryId: streamEntryId.trim() || undefined,
-          }),
-        )
-      } else if (keyType === "JSON") {
-        dispatch(
-          addKeyRequested({
-            ...basePayload,
-            value: value.trim(),
-          }),
-        )
+          dispatch(
+            addKeyRequested({
+              ...basePayload,
+              fields: validFields,
+              streamEntryId: streamEntryId.trim() || undefined,
+            }),
+          )
+          break
+        }
+        case KEY_TYPES.JSON:
+          dispatch(
+            addKeyRequested({
+              ...basePayload,
+              value: value.trim(),
+            }),
+          )
+          break
       }
 
       onClose()
@@ -247,13 +261,13 @@ export default function AddNewKey({ onClose }: AddNewKeyProps) {
                     value={keyType}
                   >
                     <option disabled>Key type</option>
-                    <option>String</option>
-                    <option>Hash</option>
-                    <option>List</option>
-                    <option>Set</option>
-                    <option>ZSet</option>
-                    <option>Stream</option>
-                    <option>JSON</option>
+                    <option>{KEY_TYPES.STRING}</option>
+                    <option>{KEY_TYPES.HASH}</option>
+                    <option>{KEY_TYPES.LIST}</option>
+                    <option>{KEY_TYPES.SET}</option>
+                    <option>{KEY_TYPES.ZSET}</option>
+                    <option>{KEY_TYPES.STREAM}</option>
+                    <option>{KEY_TYPES.JSON}</option>
                   </select>
                 </div>
               </div>
@@ -287,36 +301,36 @@ export default function AddNewKey({ onClose }: AddNewKeyProps) {
             <div className="mt-6 text-sm font-semibold border-b border-tw-dark-border pb-2">
               Key Elements
             </div>
-            {keyType === "String" ? (
+            {keyType === KEY_TYPES.STRING ? (
               <StringFields setValue={setValue} value={value} />
-            ) : keyType === "List" ? (
+            ) : keyType === KEY_TYPES.LIST ? (
               <ListFields
                 listFields={listFields}
                 onAdd={addListField}
                 onRemove={removeListField}
                 setListFields={setListFields} />
-            ) : keyType === "Hash" ? (
+            ) : keyType === KEY_TYPES.HASH ? (
               <HashFields
                 hashFields={hashFields}
                 onAdd={addHashField}
                 onRemove={removeHashField}
                 onUpdate={updateHashField}
               />
-            ) : keyType === "Set" ? (
+            ) : keyType === KEY_TYPES.SET ? (
               <SetFields
                 onAdd={addSetField}
                 onRemove={removeSetField}
                 setFields={setFields}
                 setSetFields={setSetFields}
               />
-            ) : keyType === "ZSet" ? (
+            ) : keyType === KEY_TYPES.ZSET ? (
               <ZSetFields
                 onAdd={addZsetField}
                 onRemove={removeZsetField}
                 onUpdate={updateZsetField}
                 zsetFields={zsetFields}
               />
-            ) : keyType === "Stream" ? (
+            ) : keyType === KEY_TYPES.STREAM ? (
               <StreamFields
                 onAdd={addStreamField}
                 onEntryIdChange={setStreamEntryId}
@@ -325,7 +339,7 @@ export default function AddNewKey({ onClose }: AddNewKeyProps) {
                 streamEntryId={streamEntryId}
                 streamFields={streamFields}
               />
-            ) : keyType === "JSON" ? (
+            ) : keyType === KEY_TYPES.JSON ? (
               <JsonFields setValue={setValue} value={value} />
             ) : (
               <div className="mt-2 text-sm font-light">Select a key type</div>
