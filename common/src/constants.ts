@@ -125,3 +125,13 @@ export const SORT_FIELD = {
   TIMESTAMP: "timestamp",
   METRIC: "metric",
 } as const
+
+export const KEY_TYPES = {
+  STRING: "String",
+  LIST: "List",
+  SET: "Set",
+  ZSET: "ZSet",
+  HASH: "Hash",
+  STREAM: "Stream",
+  JSON: "JSON",
+}
