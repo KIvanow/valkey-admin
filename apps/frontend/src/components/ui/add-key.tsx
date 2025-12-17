@@ -241,7 +241,7 @@ export default function AddNewKey({ onClose }: AddNewKeyProps) {
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center">
-      <div className="w-1/3 h-2/3 p-6 bg-white dark:bg-tw-dark-primary dark:border-tw-dark-border rounded-lg shadow-lg border flex flex-col">
+      <div className="w-1/2 h-3/4 p-6 bg-white dark:bg-tw-dark-primary dark:border-tw-dark-border rounded-lg shadow-lg border flex flex-col">
         <div className="flex justify-between">
           <h2 className="text-lg font-semibold">Add Key</h2>
           <button className="hover:text-tw-primary" onClick={onClose}>
@@ -249,10 +249,10 @@ export default function AddNewKey({ onClose }: AddNewKeyProps) {
           </button>
         </div>
         <form
-          className="flex-1 flex flex-col justify-between overflow-y-auto"
+          className="flex-1 flex flex-col min-h-0"
           onSubmit={handleSubmit}
         >
-          <div>
+          <div className="flex-shrink-0">
             <div className="flex w-full justify-between gap-4">
               <div className="mt-4 text-sm font-light w-1/2">
                 <div className="flex flex-col gap-2">
@@ -304,6 +304,8 @@ export default function AddNewKey({ onClose }: AddNewKeyProps) {
             <div className="mt-6 text-sm font-semibold border-b border-tw-dark-border pb-2">
               Key Elements
             </div>
+          </div>
+          <div className="flex-1 overflow-y-auto min-h-0">
             {keyType === KEY_TYPES.STRING ? (
               <StringFields setValue={setValue} value={value} />
             ) : keyType === KEY_TYPES.LIST ? (
@@ -347,28 +349,29 @@ export default function AddNewKey({ onClose }: AddNewKeyProps) {
             ) : (
               <div className="mt-2 text-sm font-light">Select a key type</div>
             )}
-
+          </div>
+          <div className="flex-shrink-0">
             {error && (
               <div className="mt-4 text-sm text-red-500 font-medium">
                 {error}
               </div>
             )}
-          </div>
 
-          <div className="pt-2 text-sm flex gap-4">
-            <button
-              className="px-4 py-2 w-full bg-tw-primary text-white rounded hover:bg-tw-primary/90"
-              disabled={keyType === "Select key type" || !keyName || jsonModuleAvailable === false}
-              type="submit"
-            >
-              Submit
-            </button>
-            <button
-              className="px-4 py-2 w-full bg-tw-dark-border/50 text-white rounded hover:bg-tw-dark-border"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
+            <div className="pt-2 text-sm flex gap-4">
+              <button
+                className="px-4 py-2 w-full bg-tw-primary text-white rounded hover:bg-tw-primary/90"
+                disabled={keyType === "Select key type" || !keyName || jsonModuleAvailable === false}
+                type="submit"
+              >
+                Submit
+              </button>
+              <button
+                className="px-4 py-2 w-full bg-tw-dark-border/50 text-white rounded hover:bg-tw-dark-border"
+                onClick={onClose}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </form>
       </div>

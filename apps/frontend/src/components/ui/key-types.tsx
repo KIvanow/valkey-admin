@@ -39,7 +39,7 @@ export function ListFields({ listFields, setListFields, onAdd, onRemove }: ListF
   }
 
   return (
-    <div>
+    <div className="flex flex-col w-full gap-2">
       {listFields.map((field, index) => (
         <div className="flex gap-4 items-start mt-4" key={index}>
           <div className="text-sm font-light w-full">
@@ -89,7 +89,7 @@ export function SetFields({ setFields, setSetFields, onAdd, onRemove }: SetField
   }
 
   return (
-    <div>
+    <div className="flex flex-col w-full gap-2">
       {setFields.map((field, index) => (
         <div className="flex gap-4 items-start mt-4" key={index}>
           <div className="text-sm font-light w-full">
