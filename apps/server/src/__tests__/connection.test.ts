@@ -229,8 +229,8 @@ describe("connectToValkey", () => {
   it("should detect JSON module availability", async () => {
     const mockClient = {
       customCommand: mock.fn(async () => [
-        [{ key: "name", value: "json" }, { key: "ver", value: 10002 }]
-      ])
+        [{ key: "name", value: "json" }, { key: "ver", value: 10002 }],
+      ]),
     }
 
     const result = await checkJsonModuleAvailability(mockClient as any)
@@ -240,8 +240,8 @@ describe("connectToValkey", () => {
   it("should return false when JSON module is not present", async () => {
     const mockClient = {
       customCommand: mock.fn(async () => [
-        [{ key: "name", value: "search" }]
-      ])
+        [{ key: "name", value: "search" }],
+      ]),
     }
 
     const result = await checkJsonModuleAvailability(mockClient as any)
