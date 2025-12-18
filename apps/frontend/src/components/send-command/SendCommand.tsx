@@ -66,7 +66,7 @@ export function SendCommand() {
           <input
             className="mb-2 px-2 py-1 text-primary text-sm dark:border-tw-dark-border border rounded"
             onChange={({ target: { value } }) => setKeysFilter(value)}
-            placeholder="Search keys"
+            placeholder="Search Response"
             value={keysFilter}
           />
           <pre
