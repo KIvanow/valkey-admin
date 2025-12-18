@@ -37,7 +37,9 @@ export function SendCommand() {
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
       e.preventDefault()
-      onSubmit()
+      if (text.trim().length > 0) {
+        onSubmit()
+      }
     } else if (e.key === "Escape") {
       e.preventDefault()
       setText("")
@@ -205,6 +207,7 @@ export function SendCommand() {
         />
         <button
           className="h-10 ml-2 px-4 py-2 bg-tw-primary cursor-pointer text-white rounded hover:bg-tw-primary/70"
+          disabled={text.trim().length === 0}
           onClick={() => onSubmit()}
         >
           Send
