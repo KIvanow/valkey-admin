@@ -9,17 +9,14 @@ const Response = ({ filter, response }: { filter: string, response: JSONObject }
   const filtered =
     R.pipe(
       toKeyPaths,
-      R.map((keyPath) => { 
-        const value = R.path(keyPath as string[], response)
-        return {
-          keyPath,
-          keyPathString: keyPath.join("."),
-          value,
-          valueString: JSON.stringify(value),
-        }
-      }),
-      // eslint-disable-next-line max-len
-      R.isEmpty(filter) ? R.identity : R.filter(({ keyPathString, valueString }) => keyPathString.includes(filter) || valueString.includes(filter)),
+      R.map((keyPath) => ({
+        keyPath,
+        keyPathString: keyPath.join("."),
+        value: R.path(keyPath as string[], response),
+        valueString: JSON.stringify(R.path(keyPath as string[], response)),
+      })),
+      R.isEmpty(filter) ? R.identity : 
+        R.filter(({ keyPathString, valueString }) => keyPathString.includes(filter) || valueString.includes(filter)),
     )(response)
 
   const onCopy = () =>

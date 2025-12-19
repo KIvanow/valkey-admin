@@ -83,9 +83,9 @@ export async function resolveHostnameOrIpAddress(hostnameOrIP: string) {
 
   const hostnameType = isIP ? "ip" : "hostname"
   try {
-    const addresses = isIP
-      ? await dns.reverse(hostnameOrIP)
-      : (await dns.lookup(hostnameOrIP, { family: 4, all: true })).map((result) => result.address)
+    const addresses = await isIP
+      ? dns.reverse(hostnameOrIP)
+      : dns.lookup(hostnameOrIP, { family: 4, all: true }).then(R.map(R.prop("address")))
 
     return { input: hostnameOrIP, hostnameType, addresses }
   } catch (err) {
