@@ -4,7 +4,7 @@
 
 Valkey Admin is a web-based administration tool for Valkey clusters. It provides an intuitive interface to monitor, manage, and interact with your Valkey instances, offering features like real-time metrics and key management.
 
-Built with React and TypeScript, Valkey Admin runs as a desktop application via Electron. Some features like hotkeys and commandlogs rely on Electron, so the app is currently only supported as a desktop app.
+Built with React and TypeScript, Valkey Admin runs as a desktop application via Electron. Some features like hotkeys and commandlogs rely on Electron, so the app is currently only fully supported as a desktop app. Use the web application for a subset of features.
 
 ## Platform Support
 
@@ -19,18 +19,54 @@ Valkey Admin works on:
 ./quickstart.sh
 ```
 
-This will install dependencies, start the Valkey cluster, and launch the development servers with automatic connection.
+This builds the full desktop application with all features (hotkeys, commandlogs, etc.). The app will be built in the `release/` folder with connection instructions.
+
+**For web development only:** Use `./quickstart-web.sh` for the development servers (limited features).
+
+### Running the Built Desktop App
+
+After building, launch the desktop app:
+
+**macOS:**
+```bash
+open "release/Valkey Admin.app"
+```
+
+**Linux:**
+```bash
+# Make executable and run AppImage
+chmod +x "release/Valkey Admin-0.0.0.AppImage"
+./release/Valkey\ Admin-0.0.0.AppImage
+
+# Or install DEB package
+sudo dpkg -i "release/valkey-admin_0.0.0_amd64.deb"
+valkey-admin
+```
+
+**Windows:** The desktop app builds for Linux/macOS only. Use `./quickstart-web.sh` for web interface.
 
 ## Manual Setup
 
-If you prefer to run things step by step:
+### Desktop App Setup
+
+For the full-featured desktop application:
 
 1. **Install dependencies:** `npm install`
 2. **Start Valkey cluster:** `./tools/valkey-cluster/scripts/build_run_cluster.sh`
-3. **Build and run the desktop app:** Use `npm run package:mac` or `npm run package:mac:nosign` (see "Create DMG" section below)
-4. **Manual connection:** Open the app and manually add a connection to `localhost:7001`
+3. **Build desktop app:**
+   - macOS: `npm run package:mac:nosign`
+   - Linux: `npm run package:linux:nosign`
+4. **Launch app:** Find the built app in `release/` folder and launch it
+5. **Connect:** Manually add a connection to `localhost:7001`
 
-**Note:** `npm run dev` is not fully supported since some features like hotkeys and commandlogs require Electron.
+### Web Development Setup
+
+For development servers (limited features - no hotkeys/commandlogs):
+
+1. **Install dependencies:** `npm install`
+2. **Start Valkey cluster:** `./tools/valkey-cluster/scripts/build_run_cluster.sh`
+3. **Start dev servers:** `npm run dev` or use `./quickstart-web.sh`
+4. **Connect:** Open http://localhost:5173 and manually add connection to `localhost:7001`
 
 ### Windows/WSL Users
 
