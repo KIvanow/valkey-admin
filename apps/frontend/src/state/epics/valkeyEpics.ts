@@ -104,13 +104,7 @@ export const connectionEpic = (store: Store) =>
         return null
       }),
       filter((action) => action !== null),
-      delay(1000),
-      tap((action) => {
-        if (action) {
-          store.dispatch(action)
-        }
-      }),
-      ignoreElements(),
+      delay(1000)
     ),
   )
 
