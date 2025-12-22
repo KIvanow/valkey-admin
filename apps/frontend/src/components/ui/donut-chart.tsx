@@ -94,7 +94,7 @@ export default function DonutChart() {
       <div className="text-center text-sm text-gray-600 dark:text-gray-400 mb-4">
         Total Memory: {formatBytes(totalMemory)}
       </div>
-      <ResponsiveContainer height={500} width="100%" className="text-sm">
+      <ResponsiveContainer className="text-sm" height={500} width="100%">
         <PieChart>
           <Pie
             cx="50%"
