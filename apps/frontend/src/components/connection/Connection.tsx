@@ -1,7 +1,8 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useSelector } from "react-redux"
 import { HousePlug } from "lucide-react"
 import * as R from "ramda"
+import { LOCAL_STORAGE } from "@common/src/constants.ts"
 import ConnectionForm from "../ui/connection-form.tsx"
 import EditForm from "../ui/edit-form.tsx"
 import type { ConnectionState } from "@/state/valkey-features/connection/connectionSlice.ts"
@@ -12,7 +13,17 @@ import { ClusterConnectionGroup } from "@/components/connection/ClusterConnectio
 export function Connection() {
   const [showConnectionForm, setShowConnectionForm] = useState(false)
   const [showEditForm, setShowEditForm] = useState(false)
-  const connections = useSelector(selectConnections)
+  const allConnections = useSelector(selectConnections)
+
+  // Only show connections that have successfully connected at least once - (they are saved in localStorage)
+  const connections = useMemo(() => {
+    const savedConnections = JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE.VALKEY_CONNECTIONS) ?? "{}",
+    )
+    return Object.fromEntries(
+      Object.entries(allConnections).filter(([id]) => id in savedConnections),
+    )
+  }, [allConnections])
 
   // grouping connections
   const { clusterGroups, standaloneConnections } = Object.entries(connections).reduce<{
