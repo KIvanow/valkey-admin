@@ -103,7 +103,7 @@ export function CommandLogTable({ data, logType }: CommandLogTableProps) {
               </div>
               <button
                 className={`text-xs font-bold w-1/6 text-center flex items-center justify-center gap-2 hover:text-tw-primary transition-colors ${sortField === SORT_FIELD.METRIC ? "text-tw-primary" : ""
-                  }`}
+                }`}
                 onClick={() => toggleSort(SORT_FIELD.METRIC)}
               >
                 {config.metricLabel}
@@ -115,7 +115,7 @@ export function CommandLogTable({ data, logType }: CommandLogTableProps) {
               </button>
               <button
                 className={`text-xs font-bold w-1/4 flex items-center justify-center gap-2 hover:text-tw-primary transition-colors ${sortField === SORT_FIELD.TIMESTAMP ? "text-tw-primary" : ""
-                  }`}
+                }`}
                 onClick={() => toggleSort(SORT_FIELD.TIMESTAMP)}
               >
                 <Clock className="text-tw-primary" size={16} />
